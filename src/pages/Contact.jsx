@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SEO from '../components/common/SEO';
-import emailjs from '@emailjs/browser';
 
 const Contact = () => {
   const navigate = useNavigate();
@@ -33,14 +32,40 @@ const Contact = () => {
 
     setIsSubmitting(true);
 
-    // Simulate form submission (replace with actual API call)
+    // Submit form to backend (sends notification emails)
     try {
-      await emailjs.sendForm(
-          import.meta.env.VITE_EMAILJS_SERVICE_ID,
-          import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-          e.target,
-          import.meta.env.VITE_EMAILJS_PUBLIC_KEY
-        );
+      // If VITE_API_BASE_URL is blank, we fall back to a relative URL.
+      // In development, Vite can proxy `/api/*` to your Flask server (see vite.config.js).
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
+      const normalizedBaseUrl = apiBaseUrl.replace(/\/+$/, '');
+      const endpoint = normalizedBaseUrl ? `${normalizedBaseUrl}/api/contact` : '/api/contact';
+
+      console.info('[Contact] Submitting contact form', {
+        endpoint,
+        hasApiBaseUrl: Boolean(normalizedBaseUrl),
+        // Avoid dumping full message content to logs
+        payloadKeys: Object.keys(formData)
+      });
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+
+      console.info('[Contact] API response', {
+        endpoint,
+        status: response.status,
+        ok: response.ok
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('[Contact] API error response body', { endpoint, status: response.status, errorText });
+        throw new Error(errorText || `Request failed with status ${response.status}`);
+      }
 
       // Track conversion event
       if (window.gtag) {
@@ -246,8 +271,8 @@ const Contact = () => {
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900 mb-1">Email</h3>
-                      <a href="mailto:info@lumeadvisory.ai" className="text-primary-600 hover:text-primary-700">
-                        info@lumeadvisory.ai
+                      <a href="mailto:info@lumeadvisory.africa" className="text-primary-600 hover:text-primary-700">
+                        info@lumeadvisory.africa
                       </a>
                     </div>
                   </div>

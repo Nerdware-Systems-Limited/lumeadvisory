@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [
     react(),
     sitemap({
-      hostname: 'https://www.lumeadvisory.ai' || 'http://localhost:3000' || 'https://lumeadvisory.onrender.com',
+      hostname: 'https://www.lumeadvisory.africa',
       dynamicRoutes: [
         '/',
         '/about',
@@ -48,6 +48,15 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    open: true
+    open: true,
+    strictPort: true,
+    proxy: {
+      // Development-only: forward API calls to the Flask backend
+      '/api': {
+        target: 'http://127.0.0.1:5000',
+        changeOrigin: true,
+        secure: false
+      }
+    }
   }
 });

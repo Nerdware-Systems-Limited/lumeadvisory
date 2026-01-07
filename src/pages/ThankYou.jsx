@@ -155,8 +155,8 @@ const ThankYou = () => {
               <div className="mt-12 pt-8 border-t border-gray-200">
                 <p className="text-gray-600">
                   Questions? Email us at{' '}
-                  <a href="mailto:info@lumeadvisory.ai" className="text-primary-600 hover:text-primary-700 font-semibold">
-                    info@lumeadvisory.ai
+                  <a href="mailto:info@lumeadvisory.africa" className="text-primary-600 hover:text-primary-700 font-semibold">
+                    info@lumeadvisory.africa
                   </a>
                 </p>
               </div>
