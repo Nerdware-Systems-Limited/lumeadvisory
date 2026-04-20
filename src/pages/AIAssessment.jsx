@@ -430,11 +430,42 @@ const AIAssessment = () => {
     }));
 
     // Simulate email send (replace with actual emailjs logic)
-    setTimeout(() => {
-      console.log('Assessment sent:', { contact, overall, pillarDetails, unsureTotal });
-      setIsSubmitting(false);
-      navigate('/thank-you');
-    }, 1500);
+    // setTimeout(() => {
+    //   console.log('Assessment sent:', { contact, overall, pillarDetails, unsureTotal });
+    //   setIsSubmitting(false);
+    //   navigate('/thank-you');
+    // }, 1500);
+
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/send-email`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      form_type: 'ai-assessment',
+      data: {
+        full_name: contact.name,
+        email: contact.email,
+        phone: contact.phone,
+        company: contact.company,
+        role: contact.role,
+        overall_score: overall,
+        maturity_level: getMaturityLevel(overall).level,
+        strategy_score: Math.round(calculatePillarScore(pillars[0], true)),
+        data_score: Math.round(calculatePillarScore(pillars[1], true)),
+        tech_score: Math.round(calculatePillarScore(pillars[2], true)),
+        people_score: Math.round(calculatePillarScore(pillars[3], true)),
+        governance_score: Math.round(calculatePillarScore(pillars[4], true)),
+        execution_score: Math.round(calculatePillarScore(pillars[5], true))
+      }
+    })
+  });
+
+  const result = await response.json();
+
+  if (!result.success) {
+    throw new Error(result.error || 'Submission failed');
+  }
+
+  navigate('/thank-you');
   };
 
   if (showResults) {

@@ -34,22 +34,50 @@ const Contact = () => {
     setIsSubmitting(true);
 
     // Simulate form submission (replace with actual API call)
+    // try {
+    //   await emailjs.sendForm(
+    //       import.meta.env.VITE_EMAILJS_SERVICE_ID,
+    //       import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+    //       e.target,
+    //       import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+    //     );
+
+    //   // Track conversion event
+    //   if (window.gtag) {
+    //     window.gtag('event', 'form_submit', {
+    //       form_type: 'contact',
+    //       service: formData.service
+    //     });
+    //   }
     try {
-      await emailjs.sendForm(
-          import.meta.env.VITE_EMAILJS_SERVICE_ID,
-          import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-          e.target,
-          import.meta.env.VITE_EMAILJS_PUBLIC_KEY
-        );
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/send-email`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        form_type: 'contact',
+        data: {
+          full_name: formData.name,   // your Flask expects full_name
+          email: formData.email,
+          phone: formData.phone,
+          company: formData.company,
+          service: formData.service,
+          message: formData.message
+        }
+      })
+    });
 
-      // Track conversion event
-      if (window.gtag) {
-        window.gtag('event', 'form_submit', {
-          form_type: 'contact',
-          service: formData.service
-        });
-      }
+    const result = await response.json();
 
+    if (!result.success) {
+      throw new Error(result.error || 'Submission failed');
+    }
+
+    if (window.gtag) {
+      window.gtag('event', 'form_submit', {
+        form_type: 'contact',
+        service: formData.service
+      });
+    }
       navigate('/thank-you');
     } catch (error) {
       console.error('Form submission error:', error);

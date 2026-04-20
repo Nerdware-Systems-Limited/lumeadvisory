@@ -1,5 +1,9 @@
 import { Link } from 'react-router-dom';
 import SEO from '../components/common/SEO';
+import Consulting from '../assets/Consulting.jpg'
+import Strategy from '../assets/Strategy.png'
+import advisory from '../assets/advisory.jpg'
+import cloud from '../assets/cloud.jpg'
 
 const Services = () => {
   const services = [
@@ -16,6 +20,7 @@ const Services = () => {
             </g>
         </svg>
       ),
+      image: Strategy,
       title: 'AI Strategy & Implementation',
       description: 'Cut through the AI hype and deliver real business value. From maturity assessments to full implementation support, we help you build AI capabilities that drive measurable results.',
       features: [
@@ -34,6 +39,7 @@ const Services = () => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
         </svg>
       ),
+      image: advisory,
       title: 'ICT Investment Advisory',
       description: 'Strategic guidance for technology investments. We help you identify high-value opportunities, conduct feasibility studies, navigate regulatory frameworks, and ensure long-term sustainability.',
       features: [
@@ -50,6 +56,7 @@ const Services = () => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
         </svg>
       ),
+      image: cloud,
       title: 'Cloud Services',
       description: 'Accelerate your cloud journey without costly mistakes. Expert strategy development, migration planning, and managed services to help you leverage cloud capabilities effectively.',
       features: [
@@ -67,6 +74,7 @@ const Services = () => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
         </svg>
       ),
+      image: Consulting,
       title: 'ICT Project Consulting',
       description: 'Ensure your technology projects deliver intended business value. Comprehensive consulting from strategic alignment through implementation to continuous improvement.',
       features: [
@@ -197,10 +205,14 @@ const Services = () => {
                     </Link>
                   </div>
                   <div className="flex-1">
-                    <div className="bg-gradient-to-br from-primary-100 to-indigo-100 rounded-2xl p-8 h-80 flex items-center justify-center">
-                      <div className="text-primary-600 opacity-20">
-                        {service.icon}
-                      </div>
+                    <div className="rounded-2xl p-8 h-80 flex items-center justify-center">
+                      <div className="text-primary-600">
+                      <img 
+                        src={service.image} 
+                        alt={service.title} 
+                        className="w-auto h-80 object-contain"
+                      />
+                    </div>
                     </div>
                   </div>
                 </div>
