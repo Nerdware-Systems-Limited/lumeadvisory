@@ -10,24 +10,18 @@ const Team = () => {
       description: 'Our leadership team brings decades of combined experience in ICT strategy, digital transformation, and enterprise technology across diverse industries and markets.',
       miniMembers: [
         {
-          name: "Stanley Kamanguya",
-          title: "Chief Strategy Officer",
+          name: "Stanley Kamanguya, OGW",
+          title: "Digital Transformation Advisor & Former CEO, ICT Authority Kenya",
           img: placeholder,
-          bio: "Drives long-term digital strategy and enterprise innovation."
-        },
-        {
-          name: "Stanley Kamanguya",
-          title: "Head of Operations",
-          img: placeholder,
-          bio: "Ensures operational excellence and client delivery success."
+          bio: "18 years of IT and business leadership across public and private sectors. Former CEO of the ICT Authority of Kenya and Director of IFMIS at the National Treasury."
         }
       ],
       expertise: [
-        'Enterprise Digital Strategy',
-        'Technology Leadership',
-        'Business Transformation',
-        'Strategic Advisory'
-      ]
+        'Digital Transformation Strategy',
+        'Public Sector ICT Leadership',
+        'Public Finance Systems (IFMIS)',
+        'Strategic Advisory & Governance'
+      ],
     },
     {
       category: 'Technical Experts',
@@ -45,13 +39,21 @@ const Team = () => {
           title: "AI/ML Engineering Lead",
           img: placeholder,
           bio: "Designs and deploys advanced machine learning systems for automation, analytics, and prediction."
-        }
+        },
+        {
+          name: "Melvin Chondo",
+          title: "AI & ICT Solutions Architect | Lead Software Developer",
+          img: placeholder,
+          bio: "Transforms complex business requirements into secure, scalable systems. Built multi-tenant lending platforms adopted by 5+ microfinance institutions and engineered fraud detection solutions at KRA."
+        },
       ],
       expertise: [
         'Cloud Architecture (AWS, Azure, GCP)',
         'AI/ML Engineering',
         'Enterprise Systems Integration',
-        'Cybersecurity & Compliance'
+        'Cybersecurity & Compliance',
+        'Solution Architecture & REST APIs',
+        'Fraud & Risk Systems'  
       ]
     },
     {

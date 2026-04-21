@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   ChevronLeft, 
@@ -19,7 +19,9 @@ import {
   Download
 } from 'lucide-react';
 
+
 const AIAssessment = () => {
+  const scrollRef = useRef(null);
   const navigate = useNavigate();
 
   const pillarIcons = {
@@ -373,20 +375,33 @@ const AIAssessment = () => {
   const allAnswered = () =>
     pillars.every(p => p.questions.every(q => answers[q.id] !== undefined && answers[q.id] !== null));
 
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [currentPillar, showResults]);
+
+  const scrollToTop = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   const handleNext = () => {
     if (currentPillar < pillars.length - 1) {
       setCurrentPillar(currentPillar + 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       setShowResults(true);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const handlePrevious = () => {
     if (currentPillar > 0) {
       setCurrentPillar(currentPillar - 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
@@ -402,7 +417,6 @@ const AIAssessment = () => {
       role: '',
       website: ''
     });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleSendAssessment = async (e) => {
@@ -474,7 +488,7 @@ const AIAssessment = () => {
     const unsureTotal = getTotalUnsureCount();
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 py-8 sm:py-12 lg:py-20">
+      <div ref={scrollRef} className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 py-8 sm:py-12 lg:py-20">
         <div className="container mx-auto px-4 max-w-6xl">
           <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl p-4 sm:p-6 lg:p-12">
             {/* Header */}
@@ -524,7 +538,7 @@ const AIAssessment = () => {
               <div className="bg-gradient-to-br from-primary-600 to-primary-700 text-white p-6 sm:p-8 rounded-xl">
                 <h3 className="font-bold text-lg sm:text-xl mb-3">Next Step</h3>
                 <p className="text-sm sm:text-base text-primary-100 mb-6">
-                  Share your contact details and we'll prepare a tailored roadmap to address your gaps
+                  Share your details and we'll help you tailor a roadmap to address your gap
                 </p>
                 <button
                   onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })}
@@ -625,7 +639,7 @@ const AIAssessment = () => {
             </div>
 
             {/* Pillar Breakdown */}
-            <div className="space-y-4 sm:space-y-6 mb-6 sm:mb-8">
+            {/* <div className="space-y-4 sm:space-y-6 mb-6 sm:mb-8">
               <h3 className="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2">
                 <Target className="w-5 h-5" />
                 Pillar Breakdown
@@ -665,13 +679,13 @@ const AIAssessment = () => {
                   </div>
                 );
               })}
-            </div>
+            </div> */}
 
             {/* Contact Form */}
             <form onSubmit={handleSendAssessment} className="space-y-6 p-4 sm:p-6 bg-gray-50 rounded-xl">
               <div className="flex items-center gap-3 mb-4">
                 <Send className="w-5 h-5 sm:w-6 sm:h-6 text-primary-600" />
-                <h3 className="text-lg sm:text-xl font-bold text-gray-900">Get Your Personalized Roadmap</h3>
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900">Get Your Detailed Report and Personalized Roadmap</h3>
               </div>
               
               <div className="grid sm:grid-cols-2 gap-4">
@@ -799,7 +813,7 @@ const AIAssessment = () => {
   const Icon = pillarIcons[pillar.name];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 py-8 sm:py-12 lg:py-20">
+    <div ref={scrollRef} className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 py-8 sm:py-12 lg:py-20">
       <div className="container mx-auto px-4 max-w-4xl">
         <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl p-4 sm:p-6 lg:p-12">
           {/* Header */}
