@@ -20,7 +20,9 @@ import {
 } from 'lucide-react';
 
 
+
 const AIAssessment = () => {
+  const formRef = useRef(null);
   const scrollRef = useRef(null);
   const navigate = useNavigate();
 
@@ -541,7 +543,8 @@ const AIAssessment = () => {
                   Share your details and we'll help you tailor a roadmap to address your gap
                 </p>
                 <button
-                  onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })}
+                  // onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })}
+                  onClick={() => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
                   className="w-full bg-white text-primary-700 px-4 py-3 rounded-lg hover:bg-primary-50 transition-colors font-semibold text-sm sm:text-base flex items-center justify-center gap-2"
                 >
                   <Send className="w-4 h-4" />
@@ -682,7 +685,7 @@ const AIAssessment = () => {
             </div> */}
 
             {/* Contact Form */}
-            <form onSubmit={handleSendAssessment} className="space-y-6 p-4 sm:p-6 bg-gray-50 rounded-xl">
+            <form ref={formRef}  onSubmit={handleSendAssessment} className="space-y-6 p-4 sm:p-6 bg-gray-50 rounded-xl">
               <div className="flex items-center gap-3 mb-4">
                 <Send className="w-5 h-5 sm:w-6 sm:h-6 text-primary-600" />
                 <h3 className="text-lg sm:text-xl font-bold text-gray-900">Get Your Detailed Report and Personalized Roadmap</h3>
