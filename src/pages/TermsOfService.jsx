@@ -91,7 +91,7 @@ const TermsOfService = () => {
                 </p>
                 <p className="text-gray-600 mt-2">
                   Lume Advisory<br />
-                  Email: legal@lumeadvisory.ai<br />
+                  Email: legal@lumeadvisory.africa<br />
                   Phone: +254 XXX XXX XXX
                 </p>
                 <p className="text-gray-600 mt-4">

@@ -9,9 +9,9 @@ const SEO = ({
   ogType = 'website',
   ogImage = '/images/og-default.jpg',
   structuredData 
-}) => {
+  }) => {
   const location = useLocation();
-  const baseUrl = 'https://www.lumeadvisory.ai';
+  const baseUrl = 'https://www.lumeadvisory.africa';
   const fullUrl = `${baseUrl}${location.pathname}`;
   const canonicalUrl = canonical || fullUrl;
 

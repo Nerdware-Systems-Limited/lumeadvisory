@@ -61,7 +61,7 @@ const Footer = () => {
                 </svg>
               </a>
               <a 
-                href="mailto:info@lumeadvisory.ai"
+                href="mailto:info@lumeadvisory.africa"
                 className="text-gray-400 hover:text-primary-500 transition-colors"
                 aria-label="Email"
               >
@@ -121,8 +121,8 @@ const Footer = () => {
                 <svg className="w-5 h-5 text-primary-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
-                <a href="mailto:info@lumeadvisory.ai" className="text-sm hover:text-white transition-colors">
-                  info@lumeadvisory.ai
+                <a href="mailto:info@lumeadvisory.africa" className="text-sm hover:text-white transition-colors">
+                  info@lumeadvisory.africa
                 </a>
               </li>
               <li className="flex items-start space-x-2">
@@ -142,17 +142,6 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-sm text-gray-200">
               &copy; {currentYear} Lume Advisory. All rights reserved.
-            </p>
-            <p className="text-gray-500">
-              Powered by{" "}
-              <a
-                href="https://nerdwaretechnologies.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary-400 hover:text-primary-300 transition font-medium"
-              >
-                Nerdware Systems Limited
-              </a>
             </p>
             <div className="flex space-x-6">
               {legal.map((item) => (

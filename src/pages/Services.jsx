@@ -132,7 +132,7 @@ const Services = () => {
         "@type": "Service",
         "name": service.title,
         "description": service.description,
-        "url": `https://www.lumeadvisory.ai${service.link}`,
+        "url": `https://www.lumeadvisory.africa${service.link}`,
         "provider": {
           "@type": "Organization",
           "name": "Lume Advisory"

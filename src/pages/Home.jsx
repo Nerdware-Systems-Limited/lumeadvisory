@@ -89,8 +89,8 @@ const Home = () => {
     "@context": "https://schema.org",
     "@type": "Organization",
     "name": "Lume Advisory",
-    "url": "https://www.lumeadvisory.ai",
-    "logo": "https://www.lumeadvisory.ai/images/logo.png",
+    "url": "https://www.lumeadvisory.africa",
+    "logo": "https://www.lumeadvisory.africa/images/logo.png",
     "description": "Expert ICT investment advisory, AI strategy, cloud migration, and digital transformation consulting for forward-thinking enterprises globally",
     "address": {
       "@type": "PostalAddress",
@@ -99,7 +99,7 @@ const Home = () => {
     },
     "contactPoint": {
       "@type": "ContactPoint",
-      "email": "info@lumeadvisory.ai",
+      "email": "info@lumeadvisory.africa",
       "contactType": "Customer Service",
       "availableLanguage": ["English"]
     },
@@ -167,7 +167,7 @@ const Home = () => {
                 How we can help Maximimize Business Value
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                From Insight to implimentation, we deliver expert advice to transform your potential to perform up.
+                From Insight to implementation, we deliver expert advice to transform your potential to performance.
               </p>
             </div>
 
