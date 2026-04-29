@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { 
   ChevronLeft, 
   ChevronRight, 
@@ -22,9 +22,7 @@ import {
 
 
 const AIAssessment = () => {
-  const formRef = useRef(null);
   const scrollRef = useRef(null);
-  const navigate = useNavigate();
 
   const pillarIcons = {
     'Strategy & Business Alignment': Target,
@@ -293,6 +291,7 @@ const AIAssessment = () => {
   const [answers, setAnswers] = useState({});
   const [currentPillar, setCurrentPillar] = useState(0);
   const [showResults, setShowResults] = useState(false);
+  const [showContactModal, setShowContactModal] = useState(false);
   const [contact, setContact] = useState({
     name: '',
     email: '',
@@ -411,6 +410,7 @@ const AIAssessment = () => {
     setAnswers({});
     setCurrentPillar(0);
     setShowResults(false);
+    setShowContactModal(false);
     setContact({
       name: '',
       email: '',
@@ -445,43 +445,42 @@ const AIAssessment = () => {
       unsureCount: getUnsureCount(p)
     }));
 
-    // Simulate email send (replace with actual emailjs logic)
-    // setTimeout(() => {
-    //   console.log('Assessment sent:', { contact, overall, pillarDetails, unsureTotal });
-    //   setIsSubmitting(false);
-    //   navigate('/thank-you');
-    // }, 1500);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/send-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          form_type: 'ai-assessment',
+          data: {
+            full_name: contact.name,
+            email: contact.email,
+            phone: contact.phone,
+            company: contact.company,
+            role: contact.role,
+            overall_score: overall,
+            maturity_level: getMaturityLevel(overall).level,
+            strategy_score: Math.round(calculatePillarScore(pillars[0], true)),
+            data_score: Math.round(calculatePillarScore(pillars[1], true)),
+            tech_score: Math.round(calculatePillarScore(pillars[2], true)),
+            people_score: Math.round(calculatePillarScore(pillars[3], true)),
+            governance_score: Math.round(calculatePillarScore(pillars[4], true)),
+            execution_score: Math.round(calculatePillarScore(pillars[5], true))
+          }
+        })
+      });
 
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/send-email`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      form_type: 'ai-assessment',
-      data: {
-        full_name: contact.name,
-        email: contact.email,
-        phone: contact.phone,
-        company: contact.company,
-        role: contact.role,
-        overall_score: overall,
-        maturity_level: getMaturityLevel(overall).level,
-        strategy_score: Math.round(calculatePillarScore(pillars[0], true)),
-        data_score: Math.round(calculatePillarScore(pillars[1], true)),
-        tech_score: Math.round(calculatePillarScore(pillars[2], true)),
-        people_score: Math.round(calculatePillarScore(pillars[3], true)),
-        governance_score: Math.round(calculatePillarScore(pillars[4], true)),
-        execution_score: Math.round(calculatePillarScore(pillars[5], true))
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.error || 'Submission failed');
       }
-    })
-  });
 
-  const result = await response.json();
-
-  if (!result.success) {
-    throw new Error(result.error || 'Submission failed');
-  }
-
-  navigate('/thank-you');
+      setShowContactModal(false);
+      setShowResults(true);
+    } catch (err) {
+      alert('Something went wrong. Please try again.');
+      setIsSubmitting(false);
+    }
   };
 
   if (showResults) {
@@ -537,20 +536,19 @@ const AIAssessment = () => {
                 )}
               </div>
 
-              <div className="bg-gradient-to-br from-primary-600 to-primary-700 text-white p-6 sm:p-8 rounded-xl">
+              {/* <div className="bg-gradient-to-br from-primary-600 to-primary-700 text-white p-6 sm:p-8 rounded-xl">
                 <h3 className="font-bold text-lg sm:text-xl mb-3">Next Step</h3>
                 <p className="text-sm sm:text-base text-primary-100 mb-6">
                   Share your details and we'll help you tailor a roadmap to address your gap
                 </p>
                 <button
-                  // onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })}
-                  onClick={() => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                  onClick={() => setShowContactModal(true)}
                   className="w-full bg-white text-primary-700 px-4 py-3 rounded-lg hover:bg-primary-50 transition-colors font-semibold text-sm sm:text-base flex items-center justify-center gap-2"
                 >
                   <Send className="w-4 h-4" />
-                  Send Assessment
+                  Get My Roadmap
                 </button>
-              </div>
+              </div> */}
             </div>
 
             {/* Heatmap Visualization */}
@@ -684,126 +682,19 @@ const AIAssessment = () => {
               })}
             </div> */}
 
-            {/* Contact Form */}
-            <form ref={formRef}  onSubmit={handleSendAssessment} className="space-y-6 p-4 sm:p-6 bg-gray-50 rounded-xl">
-              <div className="flex items-center gap-3 mb-4">
-                <Send className="w-5 h-5 sm:w-6 sm:h-6 text-primary-600" />
-                <h3 className="text-lg sm:text-xl font-bold text-gray-900">Get Your Detailed Report and Personalized Roadmap</h3>
-              </div>
-              
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
-                    Full Name <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    name="name"
-                    value={contact.name}
-                    onChange={handleContactChange}
-                    required
-                    className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="Jane Doe"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
-                    Email Address <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    name="email"
-                    type="email"
-                    value={contact.email}
-                    onChange={handleContactChange}
-                    required
-                    className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="jane@company.com"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
-                    Company <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    name="company"
-                    value={contact.company}
-                    onChange={handleContactChange}
-                    required
-                    className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="Your Company"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Role</label>
-                  <input
-                    name="role"
-                    value={contact.role}
-                    onChange={handleContactChange}
-                    className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="CTO / Head of Data"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Phone</label>
-                  <input
-                    name="phone"
-                    value={contact.phone}
-                    onChange={handleContactChange}
-                    className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="+254 7XX XXX XXX"
-                  />
-                </div>
-
-                <input
-                  name="website"
-                  value={contact.website}
-                  onChange={handleContactChange}
-                  style={{ display: 'none' }}
-                  tabIndex="-1"
-                  autoComplete="off"
-                />
-              </div>
-
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-4">
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Sending...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-4 h-4" />
-                      Send Assessment
-                    </>
-                  )}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={reset}
-                  className="border border-gray-300 text-gray-700 px-4 py-2 sm:py-3 rounded-lg hover:bg-gray-50 transition-colors font-semibold flex items-center justify-center gap-2 text-sm sm:text-base"
-                >
-                  <RotateCcw className="w-4 h-4" />
-                  Reset
-                </button>
-
-                <Link to="/" className="text-sm text-primary-600 font-semibold underline sm:ml-auto self-center">
-                  Back to Home
-                </Link>
-              </div>
-
-              <p className="text-xs sm:text-sm text-gray-500">
-                By sending this assessment you agree to be contacted by our team. We handle your data according to our Privacy Policy.
-              </p>
-            </form>
+            {/* Action Footer */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t mt-6">
+              <button
+                onClick={reset}
+                className="border border-gray-300 text-gray-700 px-4 py-2 sm:py-3 rounded-lg hover:bg-gray-50 transition-colors font-semibold flex items-center justify-center gap-2 text-sm sm:text-base"
+              >
+                <RotateCcw className="w-4 h-4" />
+                Retake Assessment
+              </button>
+              <Link to="/" className="text-sm text-primary-600 font-semibold underline self-center">
+                Back to Home
+              </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -963,7 +854,10 @@ const AIAssessment = () => {
 
             {currentPillar === pillars.length - 1 ? (
               <button
-                onClick={() => setShowResults(true)}
+                onClick={() => {
+  console.log("clicked");
+  setShowContactModal(true);
+}}
                 disabled={!allAnswered()}
                 className={`order-3 px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 text-sm sm:text-base ${
                   allAnswered()
@@ -991,6 +885,156 @@ const AIAssessment = () => {
           </div>
         </div>
       </div>
+
+      {/* Contact Modal */}
+      {showContactModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-t-2xl p-5 sm:p-6">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <BarChart3 className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg sm:text-xl font-bold">Almost There!</h2>
+                    <p className="text-xs sm:text-sm text-primary-100 mt-0.5">Enter your details to view your results and receive a personalised roadmap by email.</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowContactModal(false)}
+                  className="text-white/70 hover:text-white transition-colors flex-shrink-0 mt-0.5"
+                  aria-label="Close"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* Modal Form */}
+            <form onSubmit={handleSendAssessment} className="p-5 sm:p-6 space-y-4">
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5">
+                    Full Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    name="name"
+                    value={contact.name}
+                    onChange={handleContactChange}
+                    required
+                    className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    placeholder="Jane Doe"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5">
+                    Email Address <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    name="email"
+                    type="email"
+                    value={contact.email}
+                    onChange={handleContactChange}
+                    required
+                    className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    placeholder="jane@company.com"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5">
+                    Company <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    name="company"
+                    value={contact.company}
+                    onChange={handleContactChange}
+                    required
+                    className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    placeholder="Your Company"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5">Role</label>
+                  <input
+                    name="role"
+                    value={contact.role}
+                    onChange={handleContactChange}
+                    className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    placeholder="CTO / Head of Data"
+                  />
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5">Phone</label>
+                  <input
+                    name="phone"
+                    value={contact.phone}
+                    onChange={handleContactChange}
+                    className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    placeholder="+254 7XX XXX XXX"
+                  />
+                </div>
+
+                {/* Honeypot */}
+                <input
+                  name="website"
+                  value={contact.website}
+                  onChange={handleContactChange}
+                  style={{ display: 'none' }}
+                  tabIndex="-1"
+                  autoComplete="off"
+                />
+              </div>
+
+              {/* Email notification hint */}
+              <div className="flex items-start gap-2 p-3 bg-blue-50 border border-blue-100 rounded-lg">
+                <Send className="w-4 h-4 text-primary-600 flex-shrink-0 mt-0.5" />
+                <p className="text-xs text-gray-600">
+                  Your detailed report and personalised roadmap will be sent to your email while you review your results.
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 pt-1">
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex-1 bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      <BarChart3 className="w-4 h-4" />
+                      View My Results
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowContactModal(false)}
+                  className="border border-gray-300 text-gray-700 px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors font-semibold text-sm"
+                >
+                  Cancel
+                </button>
+              </div>
+
+              <p className="text-xs text-gray-400 text-center">
+                By submitting you agree to be contacted by our team. We handle your data per our Privacy Policy.
+              </p>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
