@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  ChevronLeft, 
-  ChevronRight, 
-  Send, 
-  RotateCcw, 
-  CheckCircle2, 
+import {
+  ChevronLeft,
+  ChevronRight,
+  Send,
+  RotateCcw,
+  CheckCircle2,
   AlertCircle,
   TrendingUp,
   Target,
@@ -16,13 +16,19 @@ import {
   Zap,
   HelpCircle,
   BarChart3,
-  Download
+  Download,
+  Sparkles,
+  ArrowRight,
+  Brain
 } from 'lucide-react';
-
-
 
 const AIAssessment = () => {
   const scrollRef = useRef(null);
+  const [animatedProgress, setAnimatedProgress] = useState(0);
+  const [selectedAnswers, setSelectedAnswers] = useState({});
+  const [hoveredOption, setHoveredOption] = useState(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [questionAnimations, setQuestionAnimations] = useState({});
 
   const pillarIcons = {
     'Strategy & Business Alignment': Target,
@@ -302,6 +308,32 @@ const AIAssessment = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Animate progress on mount and pillar change
+  useEffect(() => {
+    const targetProgress = Math.round(((currentPillar + 1) / pillars.length) * 100);
+    const timer = setTimeout(() => setAnimatedProgress(targetProgress), 100);
+    return () => clearTimeout(timer);
+  }, [currentPillar]);
+
+  // Animate questions on pillar change
+  useEffect(() => {
+    const newAnimations = {};
+    pillars[currentPillar]?.questions.forEach((q, idx) => {
+      newAnimations[q.id] = false;
+    });
+    setQuestionAnimations(newAnimations);
+
+    const timer = setTimeout(() => {
+      const animations = {};
+      pillars[currentPillar]?.questions.forEach((q, idx) => {
+        animations[q.id] = true;
+      });
+      setQuestionAnimations(animations);
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [currentPillar]);
+
   const handleAnswerChange = (id, value) => {
     setAnswers(prev => ({ ...prev, [id]: value }));
   };
@@ -317,7 +349,6 @@ const AIAssessment = () => {
       const v = answers[q.id];
       if (v !== undefined && v !== null) {
         if (excludeUnsure && v === 0) {
-          // Skip unsure answers when calculating actual score
           return;
         }
         if (v > 0) {
@@ -333,9 +364,9 @@ const AIAssessment = () => {
     let sum = 0, count = 0;
     pillars.forEach(p => p.questions.forEach(q => {
       const v = answers[q.id];
-      if (v && v > 0) { 
-        sum += v; 
-        count++; 
+      if (v && v > 0) {
+        sum += v;
+        count++;
       }
     }));
     return count ? Math.round((sum / (count * 5)) * 100) : 0;
@@ -354,11 +385,11 @@ const AIAssessment = () => {
   };
 
   const getMaturityLevel = (score) => {
-    if (score >= 80) return { level: 'Advanced', color: 'text-emerald-600', bgColor: 'bg-emerald-50', borderColor: 'border-emerald-200' };
-    if (score >= 60) return { level: 'Developing', color: 'text-blue-600', bgColor: 'bg-blue-50', borderColor: 'border-blue-200' };
-    if (score >= 40) return { level: 'Emerging', color: 'text-amber-600', bgColor: 'bg-amber-50', borderColor: 'border-amber-200' };
-    if (score >= 20) return { level: 'Initial', color: 'text-orange-600', bgColor: 'bg-orange-50', borderColor: 'border-orange-200' };
-    return { level: 'Not Started', color: 'text-red-600', bgColor: 'bg-red-50', borderColor: 'border-red-200' };
+    if (score >= 80) return { level: 'Advanced', color: 'text-emerald-600', bgColor: 'bg-emerald-50', borderColor: 'border-emerald-200', gradient: 'from-emerald-500 to-teal-600' };
+    if (score >= 60) return { level: 'Developing', color: 'text-blue-600', bgColor: 'bg-blue-50', borderColor: 'border-blue-200', gradient: 'from-blue-500 to-indigo-600' };
+    if (score >= 40) return { level: 'Emerging', color: 'text-amber-600', bgColor: 'bg-amber-50', borderColor: 'border-amber-200', gradient: 'from-amber-500 to-orange-600' };
+    if (score >= 20) return { level: 'Initial', color: 'text-orange-600', bgColor: 'bg-orange-50', borderColor: 'border-orange-200', gradient: 'from-orange-500 to-red-600' };
+    return { level: 'Not Started', color: 'text-red-600', bgColor: 'bg-red-50', borderColor: 'border-red-200', gradient: 'from-red-500 to-pink-600' };
   };
 
   const getHeatmapColor = (score) => {
@@ -370,11 +401,34 @@ const AIAssessment = () => {
     return 'bg-gray-300';
   };
 
+  const getScaleLabel = (value) => {
+    const labels = {
+      1: { label: 'Ad hoc', desc: 'Not established' },
+      2: { label: 'Early', desc: 'Limited / pilot' },
+      3: { label: 'Developing', desc: 'Partially structured' },
+      4: { label: 'Advanced', desc: 'Well defined' },
+      5: { label: 'Leading', desc: 'Optimized / enterprise-grade' }
+    };
+    return labels[value] || null;
+  };
+
   const isPillarComplete = (index) =>
     pillars[index].questions.every(q => answers[q.id] !== undefined && answers[q.id] !== null);
 
   const allAnswered = () =>
     pillars.every(p => p.questions.every(q => answers[q.id] !== undefined && answers[q.id] !== null));
+
+  const getTotalAnsweredCount = () => {
+    let count = 0;
+    pillars.forEach(p => p.questions.forEach(q => {
+      if (answers[q.id] !== undefined && answers[q.id] !== null) count++;
+    }));
+    return count;
+  };
+
+  const getTotalQuestions = () => {
+    return pillars.reduce((acc, p) => acc + p.questions.length, 0);
+  };
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -393,17 +447,25 @@ const AIAssessment = () => {
   };
 
   const handleNext = () => {
-    if (currentPillar < pillars.length - 1) {
-      setCurrentPillar(currentPillar + 1);
-    } else {
-      setShowResults(true);
-    }
+    setIsTransitioning(true);
+    setTimeout(() => {
+      if (currentPillar < pillars.length - 1) {
+        setCurrentPillar(currentPillar + 1);
+      } else {
+        setShowResults(true);
+      }
+      setIsTransitioning(false);
+    }, 300);
   };
 
   const handlePrevious = () => {
-    if (currentPillar > 0) {
-      setCurrentPillar(currentPillar - 1);
-    }
+    setIsTransitioning(true);
+    setTimeout(() => {
+      if (currentPillar > 0) {
+        setCurrentPillar(currentPillar - 1);
+      }
+      setIsTransitioning(false);
+    }, 300);
   };
 
   const reset = () => {
@@ -411,6 +473,7 @@ const AIAssessment = () => {
     setCurrentPillar(0);
     setShowResults(false);
     setShowContactModal(false);
+    setAnimatedProgress(0);
     setContact({
       name: '',
       email: '',
@@ -477,6 +540,7 @@ const AIAssessment = () => {
 
       setShowContactModal(false);
       setShowResults(true);
+      setIsSubmitting(false);
     } catch (err) {
       alert('Something went wrong. Please try again.');
       setIsSubmitting(false);
@@ -491,111 +555,136 @@ const AIAssessment = () => {
     return (
       <div ref={scrollRef} className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 py-8 sm:py-12 lg:py-20">
         <div className="container mx-auto px-4 max-w-6xl">
-          <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl p-4 sm:p-6 lg:p-12">
+          <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 lg:p-12 border border-gray-100">
             {/* Header */}
-            <div className="text-center mb-6 sm:mb-8">
-              <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-primary-500 to-primary-700 rounded-full mb-4">
-                <BarChart3 className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+            <div className="text-center mb-8 sm:mb-12">
+              <div className="inline-flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-2xl mb-6 shadow-lg shadow-purple-500/30 transform rotate-3 hover:rotate-6 transition-transform duration-500">
+                <BarChart3 className="w-10 h-10 sm:w-12 sm:h-12 text-white" />
               </div>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">AI Readiness Results</h1>
-              <p className="text-sm sm:text-base text-gray-600">Comprehensive view of your organizational AI maturity</p>
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 bg-clip-text text-transparent mb-3">
+                AI Readiness Results
+              </h1>
+              <p className="text-base sm:text-lg text-gray-600">Comprehensive view of your organizational AI maturity</p>
             </div>
 
             {/* Overall Score Card */}
-            <div className="grid lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
-              <div className="lg:col-span-2 bg-gradient-to-br from-primary-50 to-primary-100 rounded-xl p-6 sm:p-8">
-                <div className="flex items-start justify-between mb-6">
-                  <div>
-                    <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">Overall Score</h2>
-                    <p className="text-xs sm:text-sm text-gray-600">Aggregate across all pillars</p>
-                  </div>
-                  <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 text-primary-600" />
-                </div>
-                
-                <div className="flex items-end gap-4 mb-4">
-                  <div className={`text-5xl sm:text-6xl lg:text-7xl font-bold ${maturity.color}`}>
-                    {overall}%
-                  </div>
-                  <div className={`text-lg sm:text-xl font-semibold ${maturity.color} mb-2`}>
-                    {maturity.level}
-                  </div>
-                </div>
-
-                {unsureTotal > 0 && (
-                  <div className="flex items-start gap-2 p-3 sm:p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                    <HelpCircle className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+            <div className="grid lg:grid-cols-3 gap-6 sm:gap-8 mb-8 sm:mb-12">
+              <div className="lg:col-span-2 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 rounded-2xl p-8 sm:p-10 border border-indigo-100 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-purple-200/30 to-pink-200/30 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>
+                <div className="relative">
+                  <div className="flex items-start justify-between mb-8">
                     <div>
-                      <p className="text-xs sm:text-sm font-medium text-amber-900">
-                        {unsureTotal} question{unsureTotal > 1 ? 's' : ''} marked as "Not Sure"
-                      </p>
-                      <p className="text-xs text-amber-700 mt-1">
-                        These areas may benefit from assessment or documentation
-                      </p>
+                      <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Overall Score</h2>
+                      <p className="text-sm sm:text-base text-gray-600">Aggregate across all pillars</p>
+                    </div>
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/30">
+                      <TrendingUp className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
                     </div>
                   </div>
-                )}
+
+                  <div className="flex items-end gap-4 mb-6">
+                    <div className={`text-6xl sm:text-7xl lg:text-8xl font-bold ${maturity.color} tracking-tight`}>
+                      {overall}%
+                    </div>
+                    <div className={`text-2xl sm:text-3xl font-bold ${maturity.color} mb-3`}>
+                      {maturity.level}
+                    </div>
+                  </div>
+
+                  {/* Animated Progress Bar */}
+                  <div className="w-full bg-white/60 rounded-full h-3 sm:h-4 overflow-hidden shadow-inner">
+                    <div
+                      className={`h-full rounded-full bg-gradient-to-r ${maturity.gradient} transition-all duration-1000 ease-out shadow-lg`}
+                      style={{ width: `${overall}%` }}
+                    ></div>
+                  </div>
+                </div>
               </div>
 
-              {/* <div className="bg-gradient-to-br from-primary-600 to-primary-700 text-white p-6 sm:p-8 rounded-xl">
-                <h3 className="font-bold text-lg sm:text-xl mb-3">Next Step</h3>
-                <p className="text-sm sm:text-base text-primary-100 mb-6">
-                  Share your details and we'll help you tailor a roadmap to address your gap
-                </p>
-                <button
-                  onClick={() => setShowContactModal(true)}
-                  className="w-full bg-white text-primary-700 px-4 py-3 rounded-lg hover:bg-primary-50 transition-colors font-semibold text-sm sm:text-base flex items-center justify-center gap-2"
-                >
-                  <Send className="w-4 h-4" />
-                  Get My Roadmap
-                </button>
-              </div> */}
+              <div className="bg-gradient-to-br from-gray-900 to-gray-800 text-white p-8 sm:p-10 rounded-2xl shadow-xl relative overflow-hidden">
+                <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 rounded-full blur-2xl"></div>
+                <div className="relative">
+                  <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center mb-6">
+                    <Brain className="w-6 h-6 text-purple-400" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-3">Your AI Journey</h3>
+                  <p className="text-gray-400 text-sm mb-6">
+                    Your organization is on the path to AI maturity. Discover how to accelerate your progress.
+                  </p>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 text-sm">
+                      <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
+                        <CheckCircle2 className="w-4 h-4 text-green-400" />
+                      </div>
+                      <span className="text-gray-300">{getTotalAnsweredCount()} questions answered</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm">
+                      <div className="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                        <Target className="w-4 h-4 text-purple-400" />
+                      </div>
+                      <span className="text-gray-300">{pillars.length} pillars assessed</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Heatmap Visualization */}
-            <div className="mb-6 sm:mb-8 p-4 sm:p-6 bg-gray-50 rounded-xl">
-              <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <BarChart3 className="w-5 h-5" />
+            <div className="mb-8 sm:mb-12 p-6 sm:p-8 bg-gradient-to-br from-gray-50 to-white rounded-2xl border border-gray-100">
+              <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/20">
+                  <BarChart3 className="w-5 h-5 text-white" />
+                </div>
                 Maturity Heatmap
               </h3>
-              <div className="space-y-3 sm:space-y-4">
+              <div className="space-y-4 sm:space-y-6">
                 {pillars.map((pillar, idx) => {
                   const Icon = pillarIcons[pillar.name];
+                  const score = Math.round(calculatePillarScore(pillar, true));
+                  const pillarMaturity = getMaturityLevel(score);
+
                   return (
-                    <div key={idx} className="bg-white rounded-lg p-3 sm:p-4">
-                      <div className="flex items-center gap-2 sm:gap-3 mb-3">
-                        <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-primary-600 flex-shrink-0" />
-                        <h4 className="text-xs sm:text-sm font-semibold text-gray-900 flex-1 min-w-0">
-                          {pillar.name}
-                        </h4>
+                    <div key={idx} className="bg-white rounded-xl p-4 sm:p-6 border border-gray-100 hover:border-gray-200 hover:shadow-lg transition-all duration-300">
+                      <div className="flex items-center gap-3 sm:gap-4 mb-4">
+                        <div className={`w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br ${pillarMaturity.gradient} rounded-xl flex items-center justify-center shadow-lg flex-shrink-0`}>
+                          <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-sm sm:text-base font-bold text-gray-900 truncate">{pillar.name}</h4>
+                          <p className="text-xs sm:text-sm text-gray-500">{pillar.description}</p>
+                        </div>
+                        <div className="text-right flex-shrink-0">
+                          <div className={`text-xl sm:text-2xl font-bold ${pillarMaturity.color}`}>{score}%</div>
+                          <div className={`text-xs font-semibold ${pillarMaturity.color}`}>{pillarMaturity.level}</div>
+                        </div>
                       </div>
-                      <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
+                      <div className="h-2 sm:h-3 bg-gray-100 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full bg-gradient-to-r ${pillarMaturity.gradient} transition-all duration-700 ease-out`}
+                          style={{ width: `${score}%` }}
+                        ></div>
+                      </div>
+                      <div className="mt-4 grid grid-cols-3 gap-2 sm:gap-3">
                         {pillar.questions.map((q, qIdx) => {
                           const answer = answers[q.id];
-                          const score = answer > 0 ? (answer / 5) * 100 : 0;
+                          const qScore = answer > 0 ? (answer / 5) * 100 : 0;
                           const isUnsure = answer === 0;
-                          
+
                           return (
                             <div
                               key={qIdx}
                               className="relative group"
                               title={q.question}
                             >
-                              <div 
-                                className={`h-16 sm:h-20 rounded-lg ${isUnsure ? 'bg-gray-300 border-2 border-dashed border-gray-400' : getHeatmapColor(score)} transition-all hover:scale-105 hover:shadow-lg cursor-help`}
+                              <div
+                                className={`h-16 sm:h-20 rounded-xl ${isUnsure ? 'bg-gray-200 border-2 border-dashed border-gray-300' : getHeatmapColor(qScore)} transition-all duration-300 hover:scale-105 hover:shadow-lg cursor-help flex items-center justify-center`}
                               >
-                                {isUnsure && (
-                                  <div className="absolute inset-0 flex items-center justify-center">
-                                    <HelpCircle className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600" />
-                                  </div>
-                                )}
+                                <span className="text-white font-bold text-sm sm:text-base drop-shadow-lg">{isUnsure ? '?' : Math.round(qScore)}%</span>
                               </div>
-                              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-10">
-                                <div className="bg-gray-900 text-white text-xs rounded-lg py-2 px-3 max-w-xs whitespace-normal shadow-xl">
-                                  <p className="font-medium mb-1">Q{qIdx + 1}</p>
-                                  <p className="text-gray-300">{q.question}</p>
-                                  <p className="mt-1 font-semibold">
-                                    {isUnsure ? 'Not Sure' : `${Math.round(score)}%`}
-                                  </p>
+                              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-20">
+                                <div className="bg-gray-900 text-white text-xs rounded-xl py-3 px-4 max-w-xs shadow-2xl">
+                                  <p className="font-semibold mb-1">Q{qIdx + 1}</p>
+                                  <p className="text-gray-300 text-[10px] sm:text-xs leading-relaxed">{q.question}</p>
                                 </div>
                               </div>
                             </div>
@@ -606,93 +695,51 @@ const AIAssessment = () => {
                   );
                 })}
               </div>
-              
+
               {/* Legend */}
-              <div className="mt-4 sm:mt-6 pt-4 border-t border-gray-200">
-                <p className="text-xs sm:text-sm font-semibold text-gray-700 mb-3">Maturity Scale</p>
-                <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2 sm:gap-4 text-xs">
+              <div className="mt-8 pt-6 border-t border-gray-200">
+                <p className="text-sm font-semibold text-gray-700 mb-4">Maturity Scale</p>
+                <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-3 sm:gap-6 text-sm">
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded bg-red-500"></div>
-                    <span className="text-gray-600">0-20%</span>
+                    <div className="w-5 h-5 rounded-lg bg-red-500 shadow-md"></div>
+                    <span className="text-gray-600 font-medium">0-20%</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded bg-orange-500"></div>
-                    <span className="text-gray-600">20-40%</span>
+                    <div className="w-5 h-5 rounded-lg bg-orange-500 shadow-md"></div>
+                    <span className="text-gray-600 font-medium">20-40%</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded bg-amber-500"></div>
-                    <span className="text-gray-600">40-60%</span>
+                    <div className="w-5 h-5 rounded-lg bg-amber-500 shadow-md"></div>
+                    <span className="text-gray-600 font-medium">40-60%</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded bg-blue-500"></div>
-                    <span className="text-gray-600">60-80%</span>
+                    <div className="w-5 h-5 rounded-lg bg-blue-500 shadow-md"></div>
+                    <span className="text-gray-600 font-medium">60-80%</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded bg-emerald-500"></div>
-                    <span className="text-gray-600">80-100%</span>
+                    <div className="w-5 h-5 rounded-lg bg-emerald-500 shadow-md"></div>
+                    <span className="text-gray-600 font-medium">80-100%</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded bg-gray-300 border-2 border-dashed border-gray-400"></div>
-                    <span className="text-gray-600">Not Sure</span>
+                    <div className="w-5 h-5 rounded-lg bg-gray-200 border-2 border-dashed border-gray-400"></div>
+                    <span className="text-gray-600 font-medium">Not Sure</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Pillar Breakdown */}
-            {/* <div className="space-y-4 sm:space-y-6 mb-6 sm:mb-8">
-              <h3 className="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2">
-                <Target className="w-5 h-5" />
-                Pillar Breakdown
-              </h3>
-              {pillars.map((p, idx) => {
-                const score = Math.round(calculatePillarScore(p, true));
-                const pm = getMaturityLevel(score);
-                const Icon = pillarIcons[p.name];
-                const unsureCount = getUnsureCount(p);
-                
-                return (
-                  <div key={idx} className={`border-l-4 ${pm.borderColor} bg-gray-50 rounded-r-xl p-4 sm:p-6`}>
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 sm:gap-3 mb-2">
-                          <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-primary-600 flex-shrink-0" />
-                          <h4 className="text-base sm:text-lg font-semibold text-gray-900">{p.name}</h4>
-                        </div>
-                        <p className="text-xs sm:text-sm text-gray-600 mb-2">{p.description}</p>
-                        <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm">
-                          <span className="font-medium text-gray-700">Score: {score}%</span>
-                          <span className={`font-semibold ${pm.color}`}>{pm.level}</span>
-                          {unsureCount > 0 && (
-                            <span className="flex items-center gap-1 text-amber-600">
-                              <HelpCircle className="w-3 h-3 sm:w-4 sm:h-4" />
-                              {unsureCount} unsure
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <div className="w-full sm:w-48">
-                        <div className="w-full bg-gray-200 rounded-full h-2.5 sm:h-3">
-                          <div style={{ width: `${score}%` }} className={`${getHeatmapColor(score)} h-2.5 sm:h-3 rounded-full transition-all`} />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div> */}
-
             {/* Action Footer */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t mt-6">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t border-gray-100">
               <button
                 onClick={reset}
-                className="border border-gray-300 text-gray-700 px-4 py-2 sm:py-3 rounded-lg hover:bg-gray-50 transition-colors font-semibold flex items-center justify-center gap-2 text-sm sm:text-base"
+                className="group flex items-center justify-center gap-2 border-2 border-gray-200 text-gray-700 px-6 py-3 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 font-semibold text-sm sm:text-base"
               >
-                <RotateCcw className="w-4 h-4" />
+                <RotateCcw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" />
                 Retake Assessment
               </button>
-              <Link to="/" className="text-sm text-primary-600 font-semibold underline self-center">
+              <Link to="/" className="text-sm sm:text-base text-indigo-600 font-semibold hover:text-indigo-700 transition-colors flex items-center gap-1">
                 Back to Home
+                <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </div>
@@ -705,201 +752,335 @@ const AIAssessment = () => {
   const pillar = pillars[currentPillar];
   const progress = Math.round(((currentPillar + 1) / pillars.length) * 100);
   const Icon = pillarIcons[pillar.name];
+  const answeredCount = getTotalAnsweredCount();
+  const totalQuestions = getTotalQuestions();
 
   return (
-    <div ref={scrollRef} className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 py-8 sm:py-12 lg:py-20">
+    <div ref={scrollRef} className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50/30 to-purple-50/30 pt-20 sm:pt-16 lg:pt-16 pb-6 sm:pb-10 lg:pb-16">
       <div className="container mx-auto px-4 max-w-4xl">
-        <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl p-4 sm:p-6 lg:p-12">
-          {/* Header */}
-          <div className="mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
-              AI Readiness Assessment
-            </h1>
-            <p className="text-sm sm:text-base text-gray-600">
-              Answer questions across 6 pillars to gauge organizational maturity
-            </p>
-          </div>
+        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-xl p-5 sm:p-8 lg:p-12 border border-gray-100 relative overflow-hidden">
+          {/* Background decoration */}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-indigo-100/50 via-purple-100/30 to-pink-100/30 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-cyan-100/40 to-blue-100/40 rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2 pointer-events-none"></div>
 
-          {/* Progress Bar */}
-          <div className="mb-6 sm:mb-8">
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-3">
-              <span className="text-xs sm:text-sm font-semibold text-gray-700">
-                Pillar {currentPillar + 1} of {pillars.length}
-              </span>
-              <span className="text-xs sm:text-sm font-semibold text-primary-600">
-                {progress}% Complete
-              </span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2 sm:h-2.5">
-              <div 
-                className="bg-primary-600 h-2 sm:h-2.5 rounded-full transition-all duration-500" 
-                style={{ width: `${progress}%` }} 
-              />
-            </div>
-          </div>
-
-          {/* Pillar Navigation Pills */}
-          <div className="mb-6 overflow-x-auto">
-            <div className="flex gap-2 pb-2 min-w-max sm:min-w-0">
-              {pillars.map((p, idx) => {
-                const PillarIcon = pillarIcons[p.name];
-                const isComplete = isPillarComplete(idx);
-                const isCurrent = idx === currentPillar;
-                
-                return (
-                  <button
-                    key={idx}
-                    onClick={() => setCurrentPillar(idx)}
-                    className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
-                      isCurrent
-                        ? 'bg-primary-600 text-white shadow-md'
-                        : isComplete
-                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    }`}
-                  >
-                    {isComplete && !isCurrent && (
-                      <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4" />
-                    )}
-                    <PillarIcon className="w-3 h-3 sm:w-4 sm:h-4" />
-                    <span className="hidden sm:inline">{idx + 1}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Current Pillar Header */}
-          <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl p-4 sm:p-6 mb-6 sm:mb-8">
-            <div className="flex items-start gap-3 sm:gap-4">
-              <Icon className="w-6 h-6 sm:w-8 sm:h-8 flex-shrink-0" />
-              <div className="flex-1 min-w-0">
-                <h2 className="text-xl sm:text-2xl font-bold mb-2">{pillar.name}</h2>
-                <p className="text-xs sm:text-sm text-primary-100">{pillar.description}</p>
-                <p className="text-xs sm:text-sm text-primary-100 mt-2">
-                  {pillar.questions.length} questions to answer
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Questions */}
-          <div className="space-y-6 sm:space-y-8 mb-6 sm:mb-8">
-            {pillar.questions.map((q, idx) => (
-              <div key={q.id} className="border-l-4 border-primary-200 pl-4 sm:pl-6">
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">
-                  {idx + 1}. {q.question}
-                </h3>
-                <div className="space-y-2 sm:space-y-3">
-                  {q.options.map(opt => (
-                    <label
-                      key={opt.value}
-                      className={`flex items-start p-3 sm:p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                        answers[q.id] === opt.value
-                          ? opt.isUnsure
-                            ? 'border-amber-500 bg-amber-50'
-                            : 'border-primary-600 bg-primary-50'
-                          : 'border-gray-200 hover:border-primary-300 hover:bg-gray-50'
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name={q.id}
-                        value={opt.value}
-                        checked={answers[q.id] === opt.value}
-                        onChange={() => handleAnswerChange(q.id, opt.value)}
-                        className="mt-1 mr-3 sm:mr-4 w-4 h-4 text-primary-600 focus:ring-primary-500 flex-shrink-0"
-                      />
-                      <span className="text-sm sm:text-base text-gray-700 flex-1">
-                        {opt.isUnsure && (
-                          <span className="inline-flex items-center gap-1 mr-2">
-                            <HelpCircle className="w-4 h-4 text-amber-600" />
-                          </span>
-                        )}
-                        {opt.label}
-                      </span>
-                    </label>
-                  ))}
+          <div className="relative">
+            {/* Header */}
+            <div className="mb-8 sm:mb-10">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/30 transform -rotate-3">
+                  <Brain className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+                    AI Readiness Assessment
+                  </h1>
+                  <p className="text-sm sm:text-base text-gray-600">
+                    Answer questions across 6 pillars to gauge organizational maturity
+                  </p>
                 </div>
               </div>
-            ))}
-          </div>
-
-          {/* Navigation Footer */}
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 pt-6 border-t">
-            <button
-              onClick={handlePrevious}
-              disabled={currentPillar === 0}
-              className={`order-2 sm:order-1 px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 text-sm sm:text-base ${
-                currentPillar === 0
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
-            >
-              <ChevronLeft className="w-4 h-4" />
-              Previous
-            </button>
-
-            <div className="order-1 sm:order-2 text-center">
-              <p className="text-xs sm:text-sm text-gray-600 mb-1">
-                {pillar.questions.filter(q => answers[q.id] !== undefined && answers[q.id] !== null).length} of {pillar.questions.length} answered
-              </p>
-              {!isPillarComplete(currentPillar) && (
-                <p className="text-xs text-amber-600 flex items-center justify-center gap-1">
-                  <AlertCircle className="w-3 h-3" />
-                  Answer all questions to continue
-                </p>
-              )}
             </div>
 
-            {currentPillar === pillars.length - 1 ? (
+            {/* Progress Bar */}
+            <div className="mb-8 sm:mb-10">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
+                <div className="flex items-center gap-3">
+                  <span className="text-xs sm:text-sm font-bold text-gray-700 bg-gray-100 px-3 py-1.5 rounded-full">
+                    Pillar {currentPillar + 1} of {pillars.length}
+                  </span>
+                  <span className="text-xs sm:text-sm font-semibold text-indigo-600">
+                    {progress}% Complete
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
+                  <CheckCircle2 className="w-4 h-4 text-green-500" />
+                  <span>{answeredCount} / {totalQuestions} questions answered</span>
+                </div>
+              </div>
+              <div className="w-full bg-gray-100 rounded-full h-2.5 sm:h-3 overflow-hidden shadow-inner">
+                <div
+                  className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 h-2.5 sm:h-3 rounded-full transition-all duration-700 ease-out shadow-lg shadow-purple-500/30"
+                  style={{ width: `${animatedProgress}%` }}
+                ></div>
+              </div>
+            </div>
+
+            {/* Pillar Navigation Pills */}
+            <div className="mb-8 overflow-x-auto pb-2 -mx-5 px-5 sm:mx-0 sm:px-0">
+              <div className="flex gap-2 min-w-max sm:min-w-0">
+                {pillars.map((p, idx) => {
+                  const PillarIcon = pillarIcons[p.name];
+                  const isComplete = isPillarComplete(idx);
+                  const isCurrent = idx === currentPillar;
+
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => setCurrentPillar(idx)}
+                      className={`group flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 whitespace-nowrap ${
+                        isCurrent
+                          ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg shadow-purple-500/30 transform scale-105'
+                          : isComplete
+                          ? 'bg-emerald-50 text-emerald-700 border-2 border-emerald-200 hover:bg-emerald-100'
+                          : 'bg-gray-50 text-gray-600 border-2 border-gray-100 hover:border-indigo-200 hover:bg-indigo-50'
+                      }`}
+                    >
+                      {isComplete && !isCurrent && (
+                        <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-pulse" />
+                      )}
+                      <PillarIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 transition-transform group-hover:scale-110" />
+                      <span className="hidden sm:inline">{idx + 1}. {p.name.split(' ')[0]}</span>
+                      <span className="sm:hidden">{idx + 1}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Current Pillar Header */}
+            <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white rounded-2xl p-5 sm:p-8 mb-8 sm:mb-10 relative overflow-hidden shadow-xl shadow-purple-500/20">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent transform -skew-x-12"></div>
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl transform translate-x-1/2 -translate-y-1/2"></div>
+              <div className="relative flex items-start gap-4 sm:gap-6">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-white/20 backdrop-blur-sm rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                  <Icon className="w-7 h-7 sm:w-8 sm:h-8" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xs sm:text-sm font-bold bg-white/20 px-2 py-0.5 rounded-full">
+                      0{currentPillar + 1}
+                    </span>
+                    <span className="text-xs sm:text-sm font-semibold text-white/80">PILLAR</span>
+                  </div>
+                  <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2">{pillar.name}</h2>
+                  <p className="text-xs sm:text-sm text-white/80 leading-relaxed">{pillar.description}</p>
+                  <div className="flex items-center gap-2 mt-3">
+                    <div className="flex gap-1">
+                      {pillar.questions.map((q, idx) => (
+                        <div
+                          key={idx}
+                          className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                            answers[q.id] !== undefined
+                              ? 'bg-white'
+                              : 'bg-white/30'
+                          }`}
+                        ></div>
+                      ))}
+                    </div>
+                    <span className="text-xs text-white/60">
+                      {pillar.questions.filter(q => answers[q.id] !== undefined).length} of {pillar.questions.length} answered
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Questions */}
+            <div className={`space-y-6 sm:space-y-8 mb-8 sm:mb-10 transition-all duration-300 ${isTransitioning ? 'opacity-0 transform translate-y-4' : 'opacity-100 transform translate-y-0'}`}>
+              {pillar.questions.map((q, idx) => (
+                <div
+                  key={q.id}
+                  className={`transform transition-all duration-500 ${questionAnimations[q.id] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+                  style={{ transitionDelay: `${idx * 100}ms` }}
+                >
+                  <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-5 sm:p-8 border border-gray-100 hover:border-indigo-100 transition-all duration-300 hover:shadow-lg">
+                    <div className="flex items-start gap-4 sm:gap-6 mb-6">
+                      <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center font-bold text-lg shadow-lg flex-shrink-0 transition-all duration-300 ${
+                        answers[q.id] !== undefined
+                          ? 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white'
+                          : 'bg-gray-200 text-gray-600'
+                      }`}>
+                        {answers[q.id] !== undefined ? (
+                          <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6" />
+                        ) : (
+                          idx + 1
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-base sm:text-lg lg:text-xl font-bold text-gray-900 leading-relaxed">
+                          {q.question}
+                        </h3>
+                      </div>
+                    </div>
+
+                    {/* Scale Buttons */}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
+                      {q.options.filter(opt => opt.value > 0).map(opt => {
+                        const scaleInfo = getScaleLabel(opt.value);
+                        const isSelected = answers[q.id] === opt.value;
+                        const isHovered = hoveredOption === `${q.id}-${opt.value}`;
+
+                        return (
+                          <button
+                            key={opt.value}
+                            type="button"
+                            onMouseEnter={() => setHoveredOption(`${q.id}-${opt.value}`)}
+                            onMouseLeave={() => setHoveredOption(null)}
+                            onClick={() => handleAnswerChange(q.id, opt.value)}
+                            className={`relative p-3 sm:p-4 rounded-xl border-2 transition-all duration-300 text-center group ${
+                              isSelected
+                                ? 'border-indigo-500 bg-gradient-to-br from-indigo-50 to-purple-50 shadow-lg shadow-indigo-500/20 transform scale-[1.02]'
+                                : 'border-gray-200 bg-white hover:border-indigo-300 hover:bg-gradient-to-br hover:from-gray-50 hover:to-indigo-50'
+                            }`}
+                          >
+                            <div className={`text-2xl sm:text-3xl font-bold mb-1 transition-colors duration-300 ${
+                              isSelected ? 'text-indigo-600' : isHovered ? 'text-indigo-500' : 'text-gray-400'
+                            }`}>
+                              {opt.value}
+                            </div>
+                            <div className={`text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-1 transition-colors duration-300 ${
+                              isSelected ? 'text-indigo-700' : 'text-gray-700'
+                            }`}>
+                              {scaleInfo?.label}
+                            </div>
+                            <div className="hidden sm:block text-[9px] text-gray-500 leading-tight">
+                              {scaleInfo?.desc}
+                            </div>
+                            {isSelected && (
+                              <div className="absolute -top-2 -right-2 w-6 h-6 bg-indigo-500 rounded-full flex items-center justify-center shadow-lg animate-bounce">
+                                <CheckCircle2 className="w-3.5 h-3.5 text-white" />
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Unsure Option */}
+                    <div className="mt-4">
+                      <button
+                        type="button"
+                        onClick={() => handleAnswerChange(q.id, 0)}
+                        className={`w-full p-3 rounded-xl border-2 transition-all duration-300 text-center ${
+                          answers[q.id] === 0
+                            ? 'border-amber-500 bg-amber-50'
+                            : 'border-gray-200 bg-white hover:border-amber-300 hover:bg-amber-50/50'
+                        }`}
+                      >
+                        <div className="flex items-center justify-center gap-2">
+                          <HelpCircle className={`w-4 h-4 ${answers[q.id] === 0 ? 'text-amber-600' : 'text-gray-400'}`} />
+                          <span className={`text-sm font-medium ${answers[q.id] === 0 ? 'text-amber-700' : 'text-gray-600'}`}>
+                            Not sure of current status
+                          </span>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Navigation Footer */}
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 pt-8 border-t border-gray-100">
               <button
-                onClick={() => {
-  console.log("clicked");
-  setShowContactModal(true);
-}}
-                disabled={!allAnswered()}
-                className={`order-3 px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 text-sm sm:text-base ${
-                  allAnswered()
-                    ? 'bg-primary-600 text-white hover:bg-primary-700'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                onClick={handlePrevious}
+                disabled={currentPillar === 0}
+                className={`order-2 sm:order-1 group px-6 sm:px-8 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-sm sm:text-base ${
+                  currentPillar === 0
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 hover:shadow-lg'
                 }`}
               >
-                View Results
-                <BarChart3 className="w-4 h-4" />
+                <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-300" />
+                Previous
               </button>
-            ) : (
-              <button
-                onClick={handleNext}
-                disabled={!isPillarComplete(currentPillar)}
-                className={`order-3 px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 text-sm sm:text-base ${
-                  isPillarComplete(currentPillar)
-                    ? 'bg-primary-600 text-white hover:bg-primary-700'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }`}
-              >
-                Next Pillar
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            )}
+
+              <div className="order-1 sm:order-2 text-center">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  {pillar.questions.map((q, idx) => (
+                    <div
+                      key={idx}
+                      className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                        answers[q.id] !== undefined
+                          ? 'bg-indigo-500 scale-110'
+                          : 'bg-gray-300'
+                      }`}
+                    ></div>
+                  ))}
+                </div>
+                <p className="text-xs sm:text-sm text-gray-600">
+                  {pillar.questions.filter(q => answers[q.id] !== undefined).length} of {pillar.questions.length} answered
+                </p>
+                {!isPillarComplete(currentPillar) && (
+                  <p className="text-xs text-amber-600 flex items-center justify-center gap-1 mt-1">
+                    <AlertCircle className="w-3 h-3" />
+                    Answer all questions to continue
+                  </p>
+                )}
+              </div>
+
+              {currentPillar === pillars.length - 1 ? (
+                <button
+                  onClick={() => {
+                    setShowContactModal(true);
+                  }}
+                  disabled={!allAnswered()}
+                  className={`order-3 px-6 sm:px-8 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-sm sm:text-base ${
+                    allAnswered()
+                      ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white hover:shadow-xl hover:shadow-purple-500/30 transform hover:scale-105'
+                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  }`}
+                >
+                  View Results
+                  <Sparkles className="w-4 h-4" />
+                </button>
+              ) : (
+                <button
+                  onClick={handleNext}
+                  disabled={!isPillarComplete(currentPillar)}
+                  className={`order-3 px-6 sm:px-8 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 text-sm sm:text-base ${
+                    isPillarComplete(currentPillar)
+                      ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white hover:shadow-xl hover:shadow-purple-500/30 transform hover:scale-105'
+                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  }`}
+                >
+                  Next Pillar
+                  <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+                </button>
+              )}
+            </div>
           </div>
+        </div>
+
+        {/* Dimension Navigation Dots */}
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+          {pillars.map((p, idx) => {
+            const isComplete = isPillarComplete(idx);
+            const isCurrent = idx === currentPillar;
+
+            return (
+              <button
+                key={idx}
+                onClick={() => setCurrentPillar(idx)}
+                className={`w-8 sm:w-10 h-2.5 rounded-full transition-all duration-300 ${
+                  isCurrent
+                    ? 'bg-gradient-to-r from-indigo-500 to-purple-600 shadow-lg shadow-purple-500/30'
+                    : isComplete
+                    ? 'bg-emerald-500'
+                    : 'bg-gray-300 hover:bg-gray-400'
+                }`}
+                aria-label={`Jump to dimension ${idx + 1}`}
+              ></button>
+            );
+          })}
         </div>
       </div>
 
       {/* Contact Modal */}
       {showContactModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
             {/* Modal Header */}
-            <div className="bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-t-2xl p-5 sm:p-6">
-              <div className="flex items-start justify-between gap-3">
+            <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white rounded-t-3xl p-6 sm:p-8 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transform -skew-x-12"></div>
+              <div className="relative flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <BarChart3 className="w-5 h-5 text-white" />
+                  <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0">
+                    <BarChart3 className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-lg sm:text-xl font-bold">Almost There!</h2>
-                    <p className="text-xs sm:text-sm text-primary-100 mt-0.5">Enter your details to view your results and receive a personalised roadmap by email.</p>
+                    <h2 className="text-xl sm:text-2xl font-bold">Almost There!</h2>
+                    <p className="text-xs sm:text-sm text-white/80 mt-1">Enter your details to view your results and receive a personalised roadmap by email.</p>
                   </div>
                 </div>
                 <button
@@ -907,7 +1088,7 @@ const AIAssessment = () => {
                   className="text-white/70 hover:text-white transition-colors flex-shrink-0 mt-0.5"
                   aria-label="Close"
                 >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
@@ -915,10 +1096,10 @@ const AIAssessment = () => {
             </div>
 
             {/* Modal Form */}
-            <form onSubmit={handleSendAssessment} className="p-5 sm:p-6 space-y-4">
-              <div className="grid sm:grid-cols-2 gap-4">
+            <form onSubmit={handleSendAssessment} className="p-6 sm:p-8 space-y-5">
+              <div className="grid sm:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Full Name <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -926,13 +1107,13 @@ const AIAssessment = () => {
                     value={contact.name}
                     onChange={handleContactChange}
                     required
-                    className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-3 text-sm border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300"
                     placeholder="Jane Doe"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Email Address <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -941,13 +1122,13 @@ const AIAssessment = () => {
                     value={contact.email}
                     onChange={handleContactChange}
                     required
-                    className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-3 text-sm border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300"
                     placeholder="jane@company.com"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Company <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -955,29 +1136,29 @@ const AIAssessment = () => {
                     value={contact.company}
                     onChange={handleContactChange}
                     required
-                    className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-3 text-sm border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300"
                     placeholder="Your Company"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5">Role</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Role</label>
                   <input
                     name="role"
                     value={contact.role}
                     onChange={handleContactChange}
-                    className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-3 text-sm border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300"
                     placeholder="CTO / Head of Data"
                   />
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1.5">Phone</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Phone</label>
                   <input
                     name="phone"
                     value={contact.phone}
                     onChange={handleContactChange}
-                    className="w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    className="w-full px-4 py-3 text-sm border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300"
                     placeholder="+254 7XX XXX XXX"
                   />
                 </div>
@@ -994,27 +1175,27 @@ const AIAssessment = () => {
               </div>
 
               {/* Email notification hint */}
-              <div className="flex items-start gap-2 p-3 bg-blue-50 border border-blue-100 rounded-lg">
-                <Send className="w-4 h-4 text-primary-600 flex-shrink-0 mt-0.5" />
-                <p className="text-xs text-gray-600">
+              <div className="flex items-start gap-3 p-4 bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100 rounded-xl">
+                <Send className="w-5 h-5 text-indigo-600 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-gray-600">
                   Your detailed report and personalised roadmap will be sent to your email while you review your results.
                 </p>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-3 pt-1">
+              <div className="flex flex-col sm:flex-row gap-3 pt-2">
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
+                  className="flex-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white px-6 py-4 rounded-xl hover:shadow-xl hover:shadow-purple-500/30 transition-all duration-300 font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
                 >
                   {isSubmitting ? (
                     <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin" />
                       Sending...
                     </>
                   ) : (
                     <>
-                      <BarChart3 className="w-4 h-4" />
+                      <BarChart3 className="w-5 h-5" />
                       View My Results
                     </>
                   )}
@@ -1022,7 +1203,7 @@ const AIAssessment = () => {
                 <button
                   type="button"
                   onClick={() => setShowContactModal(false)}
-                  className="border border-gray-300 text-gray-700 px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors font-semibold text-sm"
+                  className="border-2 border-gray-200 text-gray-700 px-6 py-4 rounded-xl hover:bg-gray-50 transition-colors font-semibold text-sm"
                 >
                   Cancel
                 </button>
