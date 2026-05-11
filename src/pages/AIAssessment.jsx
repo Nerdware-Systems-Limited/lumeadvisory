@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { 
   ChevronLeft, 
   ChevronRight, 
@@ -22,7 +22,6 @@ import {
 
 const AIAssessment = () => {
   const scrollRef = useRef(null);
-  const navigate = useNavigate();
 
   const pillarIcons = {
     'Strategy & Business Alignment': Target,
@@ -40,37 +39,53 @@ const AIAssessment = () => {
       questions: [
         {
           id: 's1',
-          question: 'Are your AI goals explicitly linked to business outcomes?',
+          question: 'Are your AI goals explicitly linked to measurable business outcomes?',
+          hint: 'Look for a documented AI strategy that maps to specific KPIs — not just general innovation ambitions.',
           options: [
-            { value: 1, label: 'No documented goals' },
-            { value: 2, label: 'Discussed but not formalized' },
-            { value: 3, label: 'Documented with limited KPIs' },
-            { value: 4, label: 'Clear goals with measurable KPIs' },
-            { value: 5, label: 'Enterprise-wide AI strategy with targets' },
+            { value: 1, label: 'No documented AI goals exist' },
+            { value: 2, label: 'Goals discussed informally, not tied to outcomes' },
+            { value: 3, label: 'Documented goals with some KPIs, inconsistently tracked' },
+            { value: 4, label: 'Clear goals with measurable KPIs reviewed regularly' },
+            { value: 5, label: 'Enterprise-wide AI strategy with targets cascaded to business units' },
             { value: 0, label: 'Not sure of current status', isUnsure: true }
           ]
         },
         {
           id: 's2',
-          question: 'Do you prioritize AI use cases by business value?',
+          question: 'Are AI use cases prioritized jointly by business and technology leaders?',
+          hint: 'Strong prioritization requires both business owners and technical teams at the table — not just IT deciding alone.',
           options: [
-            { value: 1, label: 'No prioritization framework' },
-            { value: 2, label: 'Ad-hoc prioritization' },
-            { value: 3, label: 'Some prioritized pilots' },
-            { value: 4, label: 'Prioritization with ROI estimates' },
-            { value: 5, label: 'Portfolio approach with scaling plans' },
+            { value: 1, label: 'No prioritization framework exists' },
+            { value: 2, label: 'Tech team prioritizes without business input' },
+            { value: 3, label: 'Some joint prioritization, ad-hoc process' },
+            { value: 4, label: 'Structured prioritization with ROI and feasibility criteria' },
+            { value: 5, label: 'Portfolio approach with joint governance and scaling plans' },
             { value: 0, label: 'Not sure of current status', isUnsure: true }
           ]
         },
         {
           id: 's3',
-          question: 'Is leadership actively sponsoring AI work?',
+          question: 'Does executive leadership visibly tie AI investment to strategic outcomes?',
+          hint: 'Look beyond IT sponsorship — does the CEO, COO, or CFO actively champion AI in board communications and budget decisions?',
           options: [
-            { value: 1, label: 'No executive support' },
-            { value: 2, label: 'Low awareness at leadership level' },
-            { value: 3, label: 'Sponsors but limited follow-through' },
-            { value: 4, label: 'Strong C-level sponsorship' },
-            { value: 5, label: 'Board-level priority and funding' },
+            { value: 1, label: 'No executive awareness or support' },
+            { value: 2, label: 'Low-level awareness, no active sponsorship' },
+            { value: 3, label: 'C-level sponsors exist but follow-through is limited' },
+            { value: 4, label: 'Strong C-level sponsorship with dedicated AI budget' },
+            { value: 5, label: 'Board-level priority with AI tied to strategic planning' },
+            { value: 0, label: 'Not sure of current status', isUnsure: true }
+          ]
+        },
+        {
+          id: 's4',
+          question: 'Does your organisation have a clear stance on adopting Generative AI (GenAI)?',
+          hint: 'GenAI requires distinct strategic decisions — which tools are approved, what use cases are in-scope, and what guardrails apply.',
+          options: [
+            { value: 1, label: 'No GenAI strategy or policy exists' },
+            { value: 2, label: 'Ad-hoc GenAI experiments with no formal position' },
+            { value: 3, label: 'Pilots underway with a developing policy stance' },
+            { value: 4, label: 'Defined GenAI strategy with approved use cases and tools' },
+            { value: 5, label: 'Enterprise GenAI roadmap integrated into broader AI strategy' },
             { value: 0, label: 'Not sure of current status', isUnsure: true }
           ]
         }
@@ -82,37 +97,53 @@ const AIAssessment = () => {
       questions: [
         {
           id: 'd1',
-          question: 'Is your data accessible and of consistent quality?',
+          question: 'How accessible is the data that AI teams need — and how clean is it?',
+          hint: 'Access and quality are different problems. Consider whether teams face friction getting data, and whether it is reliable once they have it.',
           options: [
-            { value: 1, label: 'Siloed with poor quality' },
-            { value: 2, label: 'Some usable data with gaps' },
-            { value: 3, label: 'Mostly consistent but requires work' },
-            { value: 4, label: 'High quality and accessible' },
-            { value: 5, label: 'Enterprise platform with real-time access' },
+            { value: 1, label: 'Data is siloed, inconsistent, and hard to access' },
+            { value: 2, label: 'Some usable data exists but gaps and errors are common' },
+            { value: 3, label: 'Mostly accessible and consistent, but requires significant prep work' },
+            { value: 4, label: 'High-quality, accessible data with documented lineage' },
+            { value: 5, label: 'Enterprise data platform with real-time access and quality monitoring' },
             { value: 0, label: 'Not sure of current status', isUnsure: true }
           ]
         },
         {
           id: 'd2',
-          question: 'Are there governance and ownership policies for data?',
+          question: 'Are data owners defined at the domain level with accountability for quality?',
+          hint: 'Policy existence is not enough — look for named data owners who are responsible for quality, access, and compliance within their domain.',
           options: [
-            { value: 1, label: 'No governance in place' },
-            { value: 2, label: 'Ad-hoc or nascent policies' },
-            { value: 3, label: 'Basic governance framework' },
-            { value: 4, label: 'Clear ownership and controls' },
-            { value: 5, label: 'Automated compliance and stewardship' },
+            { value: 1, label: 'No data ownership or governance in place' },
+            { value: 2, label: 'Informal policies, no clear ownership' },
+            { value: 3, label: 'Basic governance framework with partial ownership defined' },
+            { value: 4, label: 'Domain-level ownership with enforced quality standards' },
+            { value: 5, label: 'Automated governance with stewardship and compliance tracking' },
             { value: 0, label: 'Not sure of current status', isUnsure: true }
           ]
         },
         {
           id: 'd3',
-          question: 'Is data prepared for model training and deployment?',
+          question: 'Can data be reliably prepared and reused across multiple AI use cases?',
+          hint: 'Mature organisations build reusable pipelines rather than preparing data from scratch for every project.',
           options: [
-            { value: 1, label: 'Requires heavy cleaning' },
-            { value: 2, label: 'Manual prep per project' },
-            { value: 3, label: 'Some standard processes' },
-            { value: 4, label: 'Automated pipelines for many use cases' },
-            { value: 5, label: 'ML-ready with feature stores' },
+            { value: 1, label: 'Data requires heavy manual cleaning for each project' },
+            { value: 2, label: 'Manual preparation done per project with no reuse' },
+            { value: 3, label: 'Some standard processes exist but reuse is limited' },
+            { value: 4, label: 'Automated pipelines support multiple use cases with minimal rework' },
+            { value: 5, label: 'Reusable, ML-ready pipelines with feature stores and catalogues' },
+            { value: 0, label: 'Not sure of current status', isUnsure: true }
+          ]
+        },
+        {
+          id: 'd4',
+          question: 'Is your data infrastructure ready to support Generative AI workloads (e.g. RAG, embeddings, unstructured data)?',
+          hint: 'GenAI often requires unstructured data (documents, emails, audio), vector databases, and retrieval-augmented generation pipelines — distinct from traditional ML data needs.',
+          options: [
+            { value: 1, label: 'No consideration given to GenAI data requirements' },
+            { value: 2, label: 'Structured data only; unstructured data not managed' },
+            { value: 3, label: 'Some unstructured data accessible but not pipeline-ready' },
+            { value: 4, label: 'Unstructured data ingested and used in GenAI pilots' },
+            { value: 5, label: 'Enterprise-grade retrieval and embedding infrastructure in place' },
             { value: 0, label: 'Not sure of current status', isUnsure: true }
           ]
         }
@@ -124,37 +155,53 @@ const AIAssessment = () => {
       questions: [
         {
           id: 't1',
-          question: 'Do you have scalable compute and storage for AI?',
+          question: 'How modern and scalable is your cloud and compute foundation for AI workloads?',
+          hint: 'Consider whether your infrastructure can handle model training, batch inference, and real-time serving — not just general compute.',
           options: [
-            { value: 1, label: 'Very limited resources' },
-            { value: 2, label: 'Basic cloud or on-premises setup' },
-            { value: 3, label: 'Dedicated resources allocated' },
-            { value: 4, label: 'Scalable cloud with GPU access' },
-            { value: 5, label: 'Hybrid enterprise platform' },
+            { value: 1, label: 'Very limited or legacy infrastructure' },
+            { value: 2, label: 'Basic cloud or on-premises setup, not optimised for AI' },
+            { value: 3, label: 'Dedicated AI resources allocated but not fully scalable' },
+            { value: 4, label: 'Scalable cloud platform with GPU/TPU access on demand' },
+            { value: 5, label: 'Hybrid enterprise AI platform with cost and performance optimisation' },
             { value: 0, label: 'Not sure of current status', isUnsure: true }
           ]
         },
         {
           id: 't2',
-          question: 'Are deployment and monitoring automated (MLOps)?',
+          question: 'Do you have automated deployment, monitoring, and rollback for AI models?',
+          hint: 'Look for model versioning, drift detection, performance dashboards, and the ability to roll back a model if it underperforms in production.',
           options: [
-            { value: 1, label: 'No deployments yet' },
-            { value: 2, label: 'Manual deployment processes' },
-            { value: 3, label: 'Basic CI/CD implementation' },
-            { value: 4, label: 'Automated pipelines with monitoring' },
-            { value: 5, label: 'End-to-end MLOps with retraining' },
+            { value: 1, label: 'No AI models in production' },
+            { value: 2, label: 'Manual deployment with no monitoring' },
+            { value: 3, label: 'Basic CI/CD in place; monitoring is limited' },
+            { value: 4, label: 'Automated pipelines with monitoring and versioning' },
+            { value: 5, label: 'End-to-end MLOps with drift detection, rollback, and retraining' },
             { value: 0, label: 'Not sure of current status', isUnsure: true }
           ]
         },
         {
           id: 't3',
-          question: 'Does your stack integrate with core systems via APIs?',
+          question: 'How well does your AI stack integrate with core business systems (ERP, CRM, operational tools)?',
+          hint: 'AI that cannot connect to where decisions are made has limited value. Distinguish between batch and real-time integration capability.',
           options: [
-            { value: 1, label: 'No integrations' },
-            { value: 2, label: 'Limited point integrations' },
-            { value: 3, label: 'Integration requires custom development' },
-            { value: 4, label: 'Good API integrations' },
-            { value: 5, label: 'Seamless enterprise integrations' },
+            { value: 1, label: 'No integrations exist' },
+            { value: 2, label: 'Limited point integrations, mostly manual' },
+            { value: 3, label: 'Batch integrations exist but real-time is limited' },
+            { value: 4, label: 'Real-time API integrations with key systems' },
+            { value: 5, label: 'Seamless, bi-directional enterprise integrations across all core systems' },
+            { value: 0, label: 'Not sure of current status', isUnsure: true }
+          ]
+        },
+        {
+          id: 't4',
+          question: 'Do you have approved infrastructure for accessing and managing third-party GenAI models (e.g. LLM APIs, prompt management, guardrails)?',
+          hint: 'GenAI at scale requires more than API access — consider prompt versioning, rate limit management, cost controls, and output filtering.',
+          options: [
+            { value: 1, label: 'No approved GenAI tooling or infrastructure' },
+            { value: 2, label: 'Ad-hoc API usage by individuals with no controls' },
+            { value: 3, label: 'Approved tools in use but governance is limited' },
+            { value: 4, label: 'Managed LLM access with cost controls and basic guardrails' },
+            { value: 5, label: 'Enterprise GenAI platform with prompt management, guardrails, and audit trails' },
             { value: 0, label: 'Not sure of current status', isUnsure: true }
           ]
         }
@@ -166,37 +213,53 @@ const AIAssessment = () => {
       questions: [
         {
           id: 'p1',
-          question: 'What is the level of AI literacy across teams?',
+          question: 'Can business teams interpret, challenge, and act on AI outputs — not just consume them?',
+          hint: 'Passive awareness is not enough. Look for whether teams can identify when a model is likely wrong or when outputs should not be trusted.',
           options: [
-            { value: 1, label: 'Very limited understanding' },
-            { value: 2, label: 'Awareness only' },
-            { value: 3, label: 'Core teams competent' },
-            { value: 4, label: 'Wide training programs in place' },
-            { value: 5, label: 'Continuous learning culture' },
+            { value: 1, label: 'Very limited AI awareness across the organisation' },
+            { value: 2, label: 'Teams are aware of AI but accept outputs uncritically' },
+            { value: 3, label: 'Core teams are competent; broader teams rely on outputs without scrutiny' },
+            { value: 4, label: 'Wide training programmes building critical AI literacy' },
+            { value: 5, label: 'Organisation-wide culture of responsible, critical AI use' },
             { value: 0, label: 'Not sure of current status', isUnsure: true }
           ]
         },
         {
           id: 'p2',
-          question: 'Do you have the right AI talent and structure?',
+          question: 'Do you have in-house AI talent — not just external vendors — with clear roles and accountability?',
+          hint: 'Relying solely on external talent creates dependency and limits institutional learning. Look for internal data scientists, ML engineers, and AI product owners.',
           options: [
-            { value: 1, label: 'No internal AI talent' },
-            { value: 2, label: 'Rely on external vendors' },
-            { value: 3, label: 'Small internal team' },
-            { value: 4, label: 'Established team with defined roles' },
-            { value: 5, label: 'Center of Excellence with champions' },
+            { value: 1, label: 'No internal AI talent; fully vendor-dependent' },
+            { value: 2, label: 'Primarily external vendors with minimal internal knowledge transfer' },
+            { value: 3, label: 'Small internal team building capability alongside vendors' },
+            { value: 4, label: 'Established internal team with defined roles and hiring roadmap' },
+            { value: 5, label: 'AI Centre of Excellence with embedded champions across business units' },
             { value: 0, label: 'Not sure of current status', isUnsure: true }
           ]
         },
         {
           id: 'p3',
-          question: 'How receptive is the organisation to AI-driven change?',
+          question: 'Are there documented change management plans for AI deployments that affect roles or workflows?',
+          hint: 'AI rollouts that displace or change how people work require structured change management — not just a launch email.',
           options: [
-            { value: 1, label: 'Resistant to change' },
-            { value: 2, label: 'Cautious approach' },
-            { value: 3, label: 'Moderately open' },
-            { value: 4, label: 'Supportive with change management' },
-            { value: 5, label: 'Proactive innovation culture' },
+            { value: 1, label: 'No change management process for AI initiatives' },
+            { value: 2, label: 'Ad-hoc communication only' },
+            { value: 3, label: 'Change management addressed at project level informally' },
+            { value: 4, label: 'Structured change plans for AI deployments with stakeholder engagement' },
+            { value: 5, label: 'Enterprise-wide change management capability for AI-driven transformation' },
+            { value: 0, label: 'Not sure of current status', isUnsure: true }
+          ]
+        },
+        {
+          id: 'p4',
+          question: 'Are employees equipped and supported to work alongside GenAI tools responsibly?',
+          hint: 'GenAI tools like copilots and chatbots require new behaviours — knowing when to trust output, how to prompt effectively, and what data is safe to share.',
+          options: [
+            { value: 1, label: 'No GenAI tools in use by employees' },
+            { value: 2, label: 'GenAI tools used without guidance or training' },
+            { value: 3, label: 'Basic guidelines exist but training is limited' },
+            { value: 4, label: 'Structured onboarding and responsible use training for GenAI tools' },
+            { value: 5, label: 'Ongoing upskilling with embedded responsible GenAI practices' },
             { value: 0, label: 'Not sure of current status', isUnsure: true }
           ]
         }
@@ -208,37 +271,53 @@ const AIAssessment = () => {
       questions: [
         {
           id: 'g1',
-          question: 'Are AI governance and oversight defined?',
+          question: 'Are AI governance policies enforced — not just documented?',
+          hint: 'Many organisations have policies that nobody follows. Look for evidence of enforcement: approvals required before deployment, regular policy reviews, and named accountability.',
           options: [
-            { value: 1, label: 'No governance framework' },
-            { value: 2, label: 'Informal efforts only' },
-            { value: 3, label: 'Basic policies documented' },
-            { value: 4, label: 'Comprehensive framework in place' },
-            { value: 5, label: 'Active ethics board with audits' },
+            { value: 1, label: 'No AI governance framework exists' },
+            { value: 2, label: 'Informal efforts only; no enforced policies' },
+            { value: 3, label: 'Policies documented but inconsistently applied' },
+            { value: 4, label: 'Comprehensive framework with defined enforcement mechanisms' },
+            { value: 5, label: 'Active ethics board with regular audits and policy refresh cycles' },
             { value: 0, label: 'Not sure of current status', isUnsure: true }
           ]
         },
         {
           id: 'g2',
-          question: 'Do you test for bias and fairness in models?',
+          question: 'Do you systematically test AI models for bias, fairness, and unintended outcomes?',
+          hint: 'Ad-hoc checks are insufficient. Look for repeatable testing protocols applied before deployment and monitored post-deployment.',
           options: [
-            { value: 1, label: 'Not addressed' },
-            { value: 2, label: 'Awareness only' },
-            { value: 3, label: 'Ad-hoc checks performed' },
-            { value: 4, label: 'Systematic testing protocols' },
-            { value: 5, label: 'Automated bias detection and mitigation' },
+            { value: 1, label: 'Bias and fairness not addressed' },
+            { value: 2, label: 'Awareness only; no formal testing' },
+            { value: 3, label: 'Ad-hoc checks performed on some models' },
+            { value: 4, label: 'Systematic pre-deployment testing protocols in place' },
+            { value: 5, label: 'Automated bias detection, fairness monitoring, and mitigation in production' },
             { value: 0, label: 'Not sure of current status', isUnsure: true }
           ]
         },
         {
           id: 'g3',
-          question: 'Is there a risk and compliance process for AI?',
+          question: 'Is your organisation tracking and preparing for AI-specific regulation (e.g. EU AI Act, sector-specific rules)?',
+          hint: 'Regulatory exposure varies by industry and geography. Finance, healthcare, and public sector face the most immediate obligations.',
           options: [
-            { value: 1, label: 'No formal risk process' },
-            { value: 2, label: 'Ad-hoc assessments' },
-            { value: 3, label: 'Project-level assessments' },
-            { value: 4, label: 'Integrated risk management' },
-            { value: 5, label: 'Proactive regulatory tracking' },
+            { value: 1, label: 'No awareness of AI regulatory requirements' },
+            { value: 2, label: 'Aware of regulation but no preparation underway' },
+            { value: 3, label: 'Regulatory landscape assessed; gaps identified but not yet addressed' },
+            { value: 4, label: 'Compliance roadmap in place; high-risk systems being addressed' },
+            { value: 5, label: 'Proactive regulatory tracking with compliance integrated into AI delivery' },
+            { value: 0, label: 'Not sure of current status', isUnsure: true }
+          ]
+        },
+        {
+          id: 'g4',
+          question: 'Do you have specific guardrails for Generative AI risks — such as hallucination, harmful outputs, and PII leakage?',
+          hint: 'GenAI introduces risks that traditional AI governance does not cover. Hallucinated facts, confidential data in prompts, and harmful content require dedicated controls.',
+          options: [
+            { value: 1, label: 'No GenAI-specific risk controls exist' },
+            { value: 2, label: 'Risks acknowledged but no formal controls' },
+            { value: 3, label: 'Basic acceptable-use policy for GenAI tools' },
+            { value: 4, label: 'Defined guardrails covering PII, hallucination, and harmful outputs' },
+            { value: 5, label: 'Automated output filtering, PII detection, and human-in-the-loop workflows' },
             { value: 0, label: 'Not sure of current status', isUnsure: true }
           ]
         }
@@ -250,37 +329,53 @@ const AIAssessment = () => {
       questions: [
         {
           id: 'e1',
-          question: 'Are development processes standardized for AI?',
+          question: 'Is there a defined process for deciding whether to build, buy, or partner for AI capabilities?',
+          hint: 'Mature organisations do not rebuild what already exists. A consistent build-vs-buy framework avoids wasted effort and accelerates delivery.',
           options: [
-            { value: 1, label: 'No standards in place' },
-            { value: 2, label: 'Varied approaches' },
-            { value: 3, label: 'Some standards defined' },
-            { value: 4, label: 'Clear methodologies and templates' },
-            { value: 5, label: 'Enterprise lifecycle standards' },
+            { value: 1, label: 'No framework; decisions made ad-hoc' },
+            { value: 2, label: 'Decisions vary by team with no consistency' },
+            { value: 3, label: 'Informal guidance exists but is inconsistently applied' },
+            { value: 4, label: 'Clear build-vs-buy criteria applied before new AI investments' },
+            { value: 5, label: 'Enterprise framework governing build, buy, and partner decisions with review gates' },
             { value: 0, label: 'Not sure of current status', isUnsure: true }
           ]
         },
         {
           id: 'e2',
-          question: 'Do you monitor and maintain models effectively?',
+          question: 'Do you monitor both technical model performance and business outcome metrics in production?',
+          hint: 'A model can be technically stable while delivering declining business value. Both dimensions need monitoring.',
           options: [
-            { value: 1, label: 'No production models' },
-            { value: 2, label: 'Limited monitoring' },
-            { value: 3, label: 'Basic tracking in place' },
-            { value: 4, label: 'Comprehensive monitoring' },
-            { value: 5, label: 'Automated retrain and optimization' },
+            { value: 1, label: 'No models in production or no monitoring' },
+            { value: 2, label: 'Limited technical monitoring only' },
+            { value: 3, label: 'Technical metrics tracked; business outcomes monitored informally' },
+            { value: 4, label: 'Both technical and business KPIs tracked post-deployment' },
+            { value: 5, label: 'Automated monitoring with alerting across technical and business metrics' },
             { value: 0, label: 'Not sure of current status', isUnsure: true }
           ]
         },
         {
           id: 'e3',
-          question: 'Can you demonstrate business value of AI initiatives?',
+          question: 'Are AI initiatives reviewed post-deployment to confirm they delivered the original business case?',
+          hint: 'ROI measurement must close the loop — not just track KPIs, but formally compare outcomes against the pre-investment business case.',
           options: [
-            { value: 1, label: 'No measurement in place' },
-            { value: 2, label: 'Anecdotal evidence only' },
-            { value: 3, label: 'Some KPIs tracked' },
-            { value: 4, label: 'Clear ROI measurement' },
-            { value: 5, label: 'Continuous value optimization' },
+            { value: 1, label: 'No post-deployment reviews conducted' },
+            { value: 2, label: 'Anecdotal feedback only; no structured review' },
+            { value: 3, label: 'Some KPIs tracked but not compared to original business case' },
+            { value: 4, label: 'Formal post-deployment reviews comparing outcomes to business case' },
+            { value: 5, label: 'Continuous value optimisation with findings fed back into future investment decisions' },
+            { value: 0, label: 'Not sure of current status', isUnsure: true }
+          ]
+        },
+        {
+          id: 'e4',
+          question: 'Do you have a managed lifecycle for GenAI solutions — including prompt versioning, model updates, and output quality reviews?',
+          hint: 'GenAI solutions degrade over time as models are updated by vendors or prompts become stale. A managed lifecycle prevents silent quality drops.',
+          options: [
+            { value: 1, label: 'No GenAI solutions in production' },
+            { value: 2, label: 'GenAI tools in use with no lifecycle management' },
+            { value: 3, label: 'Some monitoring in place but no formal versioning or review process' },
+            { value: 4, label: 'Prompt versioning and output quality reviews conducted regularly' },
+            { value: 5, label: 'Full GenAI lifecycle management with automated quality checks and vendor update protocols' },
             { value: 0, label: 'Not sure of current status', isUnsure: true }
           ]
         }
@@ -291,6 +386,7 @@ const AIAssessment = () => {
   const [answers, setAnswers] = useState({});
   const [currentPillar, setCurrentPillar] = useState(0);
   const [showResults, setShowResults] = useState(false);
+  const [showContactModal, setShowContactModal] = useState(false);
   const [contact, setContact] = useState({
     name: '',
     email: '',
@@ -394,8 +490,6 @@ const AIAssessment = () => {
   const handleNext = () => {
     if (currentPillar < pillars.length - 1) {
       setCurrentPillar(currentPillar + 1);
-    } else {
-      setShowResults(true);
     }
   };
 
@@ -409,6 +503,7 @@ const AIAssessment = () => {
     setAnswers({});
     setCurrentPillar(0);
     setShowResults(false);
+    setShowContactModal(false);
     setContact({
       name: '',
       email: '',
@@ -443,43 +538,43 @@ const AIAssessment = () => {
       unsureCount: getUnsureCount(p)
     }));
 
-    // Simulate email send (replace with actual emailjs logic)
-    // setTimeout(() => {
-    //   console.log('Assessment sent:', { contact, overall, pillarDetails, unsureTotal });
-    //   setIsSubmitting(false);
-    //   navigate('/thank-you');
-    // }, 1500);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/send-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          form_type: 'ai-assessment',
+          data: {
+            full_name: contact.name,
+            email: contact.email,
+            phone: contact.phone,
+            company: contact.company,
+            role: contact.role,
+            overall_score: overall,
+            maturity_level: getMaturityLevel(overall).level,
+            strategy_score: Math.round(calculatePillarScore(pillars[0], true)),
+            data_score: Math.round(calculatePillarScore(pillars[1], true)),
+            tech_score: Math.round(calculatePillarScore(pillars[2], true)),
+            people_score: Math.round(calculatePillarScore(pillars[3], true)),
+            governance_score: Math.round(calculatePillarScore(pillars[4], true)),
+            execution_score: Math.round(calculatePillarScore(pillars[5], true))
+          }
+        })
+      });
 
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/send-email`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      form_type: 'ai-assessment',
-      data: {
-        full_name: contact.name,
-        email: contact.email,
-        phone: contact.phone,
-        company: contact.company,
-        role: contact.role,
-        overall_score: overall,
-        maturity_level: getMaturityLevel(overall).level,
-        strategy_score: Math.round(calculatePillarScore(pillars[0], true)),
-        data_score: Math.round(calculatePillarScore(pillars[1], true)),
-        tech_score: Math.round(calculatePillarScore(pillars[2], true)),
-        people_score: Math.round(calculatePillarScore(pillars[3], true)),
-        governance_score: Math.round(calculatePillarScore(pillars[4], true)),
-        execution_score: Math.round(calculatePillarScore(pillars[5], true))
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.error || 'Submission failed');
       }
-    })
-  });
 
-  const result = await response.json();
-
-  if (!result.success) {
-    throw new Error(result.error || 'Submission failed');
-  }
-
-  navigate('/thank-you');
+      setIsSubmitting(false);
+      setShowContactModal(false);
+      setShowResults(true);
+    } catch (err) {
+      setIsSubmitting(false);
+      alert(err.message || 'Something went wrong. Please try again.');
+    }
   };
 
   if (showResults) {
@@ -536,16 +631,16 @@ const AIAssessment = () => {
               </div>
 
               <div className="bg-gradient-to-br from-primary-600 to-primary-700 text-white p-6 sm:p-8 rounded-xl">
-                <h3 className="font-bold text-lg sm:text-xl mb-3">Next Step</h3>
+                <h3 className="font-bold text-lg sm:text-xl mb-3">Report On Its Way</h3>
                 <p className="text-sm sm:text-base text-primary-100 mb-6">
-                  Share your details and we'll help you tailor a roadmap to address your gap
+                  Your detailed report and personalised roadmap have been sent to <span className="font-semibold">{contact.email}</span>.
                 </p>
                 <button
-                  onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })}
+                  onClick={reset}
                   className="w-full bg-white text-primary-700 px-4 py-3 rounded-lg hover:bg-primary-50 transition-colors font-semibold text-sm sm:text-base flex items-center justify-center gap-2"
                 >
-                  <Send className="w-4 h-4" />
-                  Send Assessment
+                  <RotateCcw className="w-4 h-4" />
+                  Retake Assessment
                 </button>
               </div>
             </div>
@@ -681,126 +776,20 @@ const AIAssessment = () => {
               })}
             </div> */}
 
-            {/* Contact Form */}
-            <form onSubmit={handleSendAssessment} className="space-y-6 p-4 sm:p-6 bg-gray-50 rounded-xl">
-              <div className="flex items-center gap-3 mb-4">
-                <Send className="w-5 h-5 sm:w-6 sm:h-6 text-primary-600" />
-                <h3 className="text-lg sm:text-xl font-bold text-gray-900">Get Your Detailed Report and Personalized Roadmap</h3>
-              </div>
-              
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
-                    Full Name <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    name="name"
-                    value={contact.name}
-                    onChange={handleContactChange}
-                    required
-                    className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="Jane Doe"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
-                    Email Address <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    name="email"
-                    type="email"
-                    value={contact.email}
-                    onChange={handleContactChange}
-                    required
-                    className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="jane@company.com"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">
-                    Company <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    name="company"
-                    value={contact.company}
-                    onChange={handleContactChange}
-                    required
-                    className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="Your Company"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Role</label>
-                  <input
-                    name="role"
-                    value={contact.role}
-                    onChange={handleContactChange}
-                    className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="CTO / Head of Data"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-2">Phone</label>
-                  <input
-                    name="phone"
-                    value={contact.phone}
-                    onChange={handleContactChange}
-                    className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="+254 7XX XXX XXX"
-                  />
-                </div>
-
-                <input
-                  name="website"
-                  value={contact.website}
-                  onChange={handleContactChange}
-                  style={{ display: 'none' }}
-                  tabIndex="-1"
-                  autoComplete="off"
-                />
-              </div>
-
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-4">
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="bg-primary-600 text-white px-6 py-3 rounded-lg hover:bg-primary-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Sending...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-4 h-4" />
-                      Send Assessment
-                    </>
-                  )}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={reset}
-                  className="border border-gray-300 text-gray-700 px-4 py-2 sm:py-3 rounded-lg hover:bg-gray-50 transition-colors font-semibold flex items-center justify-center gap-2 text-sm sm:text-base"
-                >
-                  <RotateCcw className="w-4 h-4" />
-                  Reset
-                </button>
-
-                <Link to="/" className="text-sm text-primary-600 font-semibold underline sm:ml-auto self-center">
-                  Back to Home
-                </Link>
-              </div>
-
-              <p className="text-xs sm:text-sm text-gray-500">
-                By sending this assessment you agree to be contacted by our team. We handle your data according to our Privacy Policy.
-              </p>
-            </form>
+            {/* Results Actions */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-2">
+              <button
+                type="button"
+                onClick={reset}
+                className="border border-gray-300 text-gray-700 px-4 py-2 sm:py-3 rounded-lg hover:bg-gray-50 transition-colors font-semibold flex items-center justify-center gap-2 text-sm sm:text-base"
+              >
+                <RotateCcw className="w-4 h-4" />
+                Retake Assessment
+              </button>
+              <Link to="/" className="text-sm text-primary-600 font-semibold underline sm:ml-auto self-center">
+                Back to Home
+              </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -893,9 +882,15 @@ const AIAssessment = () => {
           <div className="space-y-6 sm:space-y-8 mb-6 sm:mb-8">
             {pillar.questions.map((q, idx) => (
               <div key={q.id} className="border-l-4 border-primary-200 pl-4 sm:pl-6">
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-1">
                   {idx + 1}. {q.question}
                 </h3>
+                {q.hint && (
+                  <p className="text-xs sm:text-sm text-gray-500 italic mb-4 flex items-start gap-1.5">
+                    <HelpCircle className="w-3.5 h-3.5 text-gray-400 flex-shrink-0 mt-0.5" />
+                    {q.hint}
+                  </p>
+                )}
                 <div className="space-y-2 sm:space-y-3">
                   {q.options.map(opt => (
                     <label
@@ -960,7 +955,7 @@ const AIAssessment = () => {
 
             {currentPillar === pillars.length - 1 ? (
               <button
-                onClick={() => setShowResults(true)}
+                onClick={() => setShowContactModal(true)}
                 disabled={!allAnswered()}
                 className={`order-3 px-6 sm:px-8 py-2 sm:py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 text-sm sm:text-base ${
                   allAnswered()
@@ -988,6 +983,156 @@ const AIAssessment = () => {
           </div>
         </div>
       </div>
+      {/* Contact Modal */}
+            {showContactModal && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+                  {/* Modal Header */}
+                  <div className="bg-gradient-to-r from-indigo-600 via-green-600 to-green-600 text-white rounded-t-3xl p-6 sm:p-8 relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent transform -skew-x-12"></div>
+                    <div className="relative flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0">
+                          <BarChart3 className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <h2 className="text-xl sm:text-2xl font-bold">Almost There!</h2>
+                          <p className="text-xs sm:text-sm text-white/80 mt-1">Enter your details to view your results and receive a personalised roadmap by email.</p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setShowContactModal(false)}
+                        className="text-white/70 hover:text-white transition-colors flex-shrink-0 mt-0.5"
+                        aria-label="Close"
+                      >
+                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+      
+                  {/* Modal Form */}
+                  <form onSubmit={handleSendAssessment} className="p-6 sm:p-8 space-y-5">
+                    <div className="grid sm:grid-cols-2 gap-5">
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Full Name <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          name="name"
+                          value={contact.name}
+                          onChange={handleContactChange}
+                          required
+                          className="w-full px-4 py-3 text-sm border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300"
+                          placeholder="Jane Doe"
+                        />
+                      </div>
+      
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Email Address <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          name="email"
+                          type="email"
+                          value={contact.email}
+                          onChange={handleContactChange}
+                          required
+                          className="w-full px-4 py-3 text-sm border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300"
+                          placeholder="jane@company.com"
+                        />
+                      </div>
+      
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Company <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          name="company"
+                          value={contact.company}
+                          onChange={handleContactChange}
+                          required
+                          className="w-full px-4 py-3 text-sm border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300"
+                          placeholder="Your Company"
+                        />
+                      </div>
+      
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">Role</label>
+                        <input
+                          name="role"
+                          value={contact.role}
+                          onChange={handleContactChange}
+                          className="w-full px-4 py-3 text-sm border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300"
+                          placeholder="CTO / Head of Data"
+                        />
+                      </div>
+      
+                      <div className="sm:col-span-2">
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">Phone</label>
+                        <input
+                          name="phone"
+                          value={contact.phone}
+                          onChange={handleContactChange}
+                          className="w-full px-4 py-3 text-sm border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300"
+                          placeholder="+254 7XX XXX XXX"
+                        />
+                      </div>
+      
+                      {/* Honeypot */}
+                      <input
+                        name="website"
+                        value={contact.website}
+                        onChange={handleContactChange}
+                        style={{ display: 'none' }}
+                        tabIndex="-1"
+                        autoComplete="off"
+                      />
+                    </div>
+      
+                    {/* Email notification hint */}
+                    <div className="flex items-start gap-3 p-4 bg-gradient-to-br from-indigo-50 to-green-50 border border-indigo-100 rounded-xl">
+                      <Send className="w-5 h-5 text-indigo-600 flex-shrink-0 mt-0.5" />
+                      <p className="text-sm text-gray-600">
+                        Your detailed report and personalised roadmap will be sent to your email while you review your results.
+                      </p>
+                    </div>
+      
+                    <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                      <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="flex-1 bg-gradient-to-r from-indigo-500 via-green-500 to-green-100 text-white px-6 py-4 rounded-xl hover:shadow-xl hover:shadow-green-500/30 transition-all duration-300 font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin" />
+                            Sending...
+                          </>
+                        ) : (
+                          <>
+                            <BarChart3 className="w-5 h-5" />
+                            View My Results
+                          </>
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowContactModal(false)}
+                        className="border-2 border-gray-200 text-gray-700 px-6 py-4 rounded-xl hover:bg-gray-50 transition-colors font-semibold text-sm"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+      
+                    <p className="text-xs text-gray-400 text-center">
+                      By submitting you agree to be contacted by our team. We handle your data per our Privacy Policy.
+                    </p>
+                  </form>
+                </div>
+              </div>
+            )}
     </div>
   );
 };
