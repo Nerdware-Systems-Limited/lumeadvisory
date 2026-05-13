@@ -311,7 +311,7 @@ const AIAssessment = () => {
         },
         {
           id: 'g4',
-          question: 'Do you have a documented understanding of AI-specific risks (e.g., hallucination, harmful outputs, PII leakage), and have you implemented specific guardrails to mitigate these risks in your deployment?',
+          question: 'Do you have an understanding of Generative AI risks, and have you implemented specific guardrails to mitigate them in your deployment?',
           hint: 'GenAI introduces risks that traditional AI governance does not cover. Hallucinated facts, confidential data in prompts, and harmful content require dedicated controls.',
           options: [
             { value: 1, label: 'No awareness or controls for GenAI-specific risks' },
