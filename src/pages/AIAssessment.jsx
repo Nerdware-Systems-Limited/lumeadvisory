@@ -39,14 +39,14 @@ const AIAssessment = () => {
       questions: [
         {
           id: 's1',
-          question: 'Are your AI goals explicitly linked to measurable business outcomes?',
-          hint: 'Look for a documented AI strategy that maps to specific KPIs — not just general innovation ambitions.',
+          question: 'Does your organisation have a clear stance on adopting Artificial Intelligence (AI)?',
+          hint: 'AI requires distinct strategic decisions — which tools are approved, what use cases are in-scope, and what guardrails apply.',
           options: [
-            { value: 1, label: 'No documented AI goals exist' },
-            { value: 2, label: 'Goals discussed informally, not tied to outcomes' },
-            { value: 3, label: 'Documented goals with some KPIs, inconsistently tracked' },
-            { value: 4, label: 'Clear goals with measurable KPIs reviewed regularly' },
-            { value: 5, label: 'Enterprise-wide AI strategy with targets cascaded to business units' },
+            { value: 1, label: 'No AI strategy or policy exists' },
+            { value: 2, label: 'Ad-hoc AI experiments with no formal position' },
+            { value: 3, label: 'Pilots underway with a developing policy stance' },
+            { value: 4, label: 'Defined AI strategy with approved use cases and tools' },
+            { value: 5, label: 'Enterprise AI roadmap integrated into broader AI strategy' },
             { value: 0, label: 'Not sure of current status', isUnsure: true }
           ]
         },
@@ -76,19 +76,20 @@ const AIAssessment = () => {
             { value: 0, label: 'Not sure of current status', isUnsure: true }
           ]
         },
-        {
+          {
           id: 's4',
-          question: 'Does your organisation have a clear stance on adopting Generative AI (GenAI)?',
-          hint: 'GenAI requires distinct strategic decisions — which tools are approved, what use cases are in-scope, and what guardrails apply.',
+          question: 'Are your AI goals explicitly linked to measurable business outcomes?',
+          hint: 'Look for a documented AI strategy that maps to specific KPIs — not just general innovation ambitions.',
           options: [
-            { value: 1, label: 'No GenAI strategy or policy exists' },
-            { value: 2, label: 'Ad-hoc GenAI experiments with no formal position' },
-            { value: 3, label: 'Pilots underway with a developing policy stance' },
-            { value: 4, label: 'Defined GenAI strategy with approved use cases and tools' },
-            { value: 5, label: 'Enterprise GenAI roadmap integrated into broader AI strategy' },
+            { value: 1, label: 'No documented AI goals exist' },
+            { value: 2, label: 'Goals discussed informally, not tied to outcomes' },
+            { value: 3, label: 'Documented goals with some KPIs, inconsistently tracked' },
+            { value: 4, label: 'Clear goals with measurable KPIs reviewed regularly' },
+            { value: 5, label: 'Enterprise-wide AI strategy with targets cascaded to business units' },
             { value: 0, label: 'Not sure of current status', isUnsure: true }
           ]
         }
+        
       ]
     },
     {
@@ -136,13 +137,13 @@ const AIAssessment = () => {
         },
         {
           id: 'd4',
-          question: 'Is your data infrastructure ready to support Generative AI workloads (e.g. RAG, embeddings, unstructured data)?',
-          hint: 'GenAI often requires unstructured data (documents, emails, audio), vector databases, and retrieval-augmented generation pipelines — distinct from traditional ML data needs.',
+          question: 'Is your data infrastructure ready to support  AI workloads (e.g. RAG, embeddings, unstructured data)?',
+          hint: 'AI often requires unstructured data (documents, emails, audio), vector databases, and retrieval-augmented generation pipelines — distinct from traditional ML data needs.',
           options: [
-            { value: 1, label: 'No consideration given to GenAI data requirements' },
+            { value: 1, label: 'No consideration given to AI data requirements' },
             { value: 2, label: 'Structured data only; unstructured data not managed' },
             { value: 3, label: 'Some unstructured data accessible but not pipeline-ready' },
-            { value: 4, label: 'Unstructured data ingested and used in GenAI pilots' },
+            { value: 4, label: 'Unstructured data ingested and used in AI pilots' },
             { value: 5, label: 'Enterprise-grade retrieval and embedding infrastructure in place' },
             { value: 0, label: 'Not sure of current status', isUnsure: true }
           ]
@@ -194,14 +195,14 @@ const AIAssessment = () => {
         },
         {
           id: 't4',
-          question: 'Do you have approved infrastructure for accessing and managing third-party GenAI models (e.g. LLM APIs, prompt management, guardrails)?',
-          hint: 'GenAI at scale requires more than API access — consider prompt versioning, rate limit management, cost controls, and output filtering.',
+          question: 'Do you have approved infrastructure for accessing and managing third-party AI models (e.g. LLM APIs, prompt management, guardrails)?',
+          hint: 'AI at scale requires more than API access — consider prompt versioning, rate limit management, cost controls, and output filtering.',
           options: [
-            { value: 1, label: 'No approved GenAI tooling or infrastructure' },
+            { value: 1, label: 'No approved AI tooling or infrastructure' },
             { value: 2, label: 'Ad-hoc API usage by individuals with no controls' },
             { value: 3, label: 'Approved tools in use but governance is limited' },
             { value: 4, label: 'Managed LLM access with cost controls and basic guardrails' },
-            { value: 5, label: 'Enterprise GenAI platform with prompt management, guardrails, and audit trails' },
+            { value: 5, label: 'Enterprise AI platform with prompt management, guardrails, and audit trails' },
             { value: 0, label: 'Not sure of current status', isUnsure: true }
           ]
         }
@@ -252,14 +253,14 @@ const AIAssessment = () => {
         },
         {
           id: 'p4',
-          question: 'Are employees equipped and supported to work alongside GenAI tools responsibly?',
-          hint: 'GenAI tools like copilots and chatbots require new behaviours — knowing when to trust output, how to prompt effectively, and what data is safe to share.',
+          question: 'Are employees equipped and supported to work alongside AI tools responsibly?',
+          hint: 'AI tools like copilots and chatbots require new behaviours — knowing when to trust output, how to prompt effectively, and what data is safe to share.',
           options: [
-            { value: 1, label: 'No GenAI tools in use by employees' },
-            { value: 2, label: 'GenAI tools used without guidance or training' },
+            { value: 1, label: 'No AI tools in use by employees' },
+            { value: 2, label: 'AI tools used without guidance or training' },
             { value: 3, label: 'Basic guidelines exist but training is limited' },
-            { value: 4, label: 'Structured onboarding and responsible use training for GenAI tools' },
-            { value: 5, label: 'Ongoing upskilling with embedded responsible GenAI practices' },
+            { value: 4, label: 'Structured onboarding and responsible use training for AI tools' },
+            { value: 5, label: 'Ongoing upskilling with embedded responsible AI practices' },
             { value: 0, label: 'Not sure of current status', isUnsure: true }
           ]
         }
@@ -297,7 +298,7 @@ const AIAssessment = () => {
         },
         {
           id: 'g3',
-          question: 'Is your organisation tracking and preparing for AI-specific regulation (e.g. EU AI Act, sector-specific rules)?',
+          question: 'Is your organisation tracking and preparing for AI-specific regulation and policies?',
           hint: 'Regulatory exposure varies by industry and geography. Finance, healthcare, and public sector face the most immediate obligations.',
           options: [
             { value: 1, label: 'No awareness of AI regulatory requirements' },
@@ -310,12 +311,12 @@ const AIAssessment = () => {
         },
         {
           id: 'g4',
-          question: 'Do you have specific guardrails for Generative AI risks — such as hallucination, harmful outputs, and PII leakage?',
+          question: 'Do you have a documented understanding and specific guardrails for Generative AI risks — such as hallucination, harmful outputs, and PII leakage?',
           hint: 'GenAI introduces risks that traditional AI governance does not cover. Hallucinated facts, confidential data in prompts, and harmful content require dedicated controls.',
           options: [
             { value: 1, label: 'No GenAI-specific risk controls exist' },
             { value: 2, label: 'Risks acknowledged but no formal controls' },
-            { value: 3, label: 'Basic acceptable-use policy for GenAI tools' },
+            { value: 3, label: 'Basic acceptable-use policy for AI tools' },
             { value: 4, label: 'Defined guardrails covering PII, hallucination, and harmful outputs' },
             { value: 5, label: 'Automated output filtering, PII detection, and human-in-the-loop workflows' },
             { value: 0, label: 'Not sure of current status', isUnsure: true }
@@ -368,14 +369,14 @@ const AIAssessment = () => {
         },
         {
           id: 'e4',
-          question: 'Do you have a managed lifecycle for GenAI solutions — including prompt versioning, model updates, and output quality reviews?',
-          hint: 'GenAI solutions degrade over time as models are updated by vendors or prompts become stale. A managed lifecycle prevents silent quality drops.',
+          question: 'Do you have a managed lifecycle for AI solutions — including prompt versioning, model updates, and output quality reviews?',
+          hint: 'AI solutions degrade over time as models are updated by vendors or prompts become stale. A managed lifecycle prevents silent quality drops.',
           options: [
-            { value: 1, label: 'No GenAI solutions in production' },
-            { value: 2, label: 'GenAI tools in use with no lifecycle management' },
+            { value: 1, label: 'No AI solutions in production' },
+            { value: 2, label: 'AI tools in use with no lifecycle management' },
             { value: 3, label: 'Some monitoring in place but no formal versioning or review process' },
             { value: 4, label: 'Prompt versioning and output quality reviews conducted regularly' },
-            { value: 5, label: 'Full GenAI lifecycle management with automated quality checks and vendor update protocols' },
+            { value: 5, label: 'Full AI lifecycle management with automated quality checks and vendor update protocols' },
             { value: 0, label: 'Not sure of current status', isUnsure: true }
           ]
         }
