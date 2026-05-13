@@ -311,14 +311,14 @@ const AIAssessment = () => {
         },
         {
           id: 'g4',
-          question: 'Do you have a documented understanding and specific guardrails for Generative AI risks — such as hallucination, harmful outputs, and PII leakage?',
+          question: 'Do you have a documented understanding of AI-specific risks (e.g., hallucination, harmful outputs, PII leakage), and have you implemented specific guardrails to mitigate these risks in your deployment?',
           hint: 'GenAI introduces risks that traditional AI governance does not cover. Hallucinated facts, confidential data in prompts, and harmful content require dedicated controls.',
           options: [
-            { value: 1, label: 'No GenAI-specific risk controls exist' },
-            { value: 2, label: 'Risks acknowledged but no formal controls' },
-            { value: 3, label: 'Basic acceptable-use policy for AI tools' },
-            { value: 4, label: 'Defined guardrails covering PII, hallucination, and harmful outputs' },
-            { value: 5, label: 'Automated output filtering, PII detection, and human-in-the-loop workflows' },
+            { value: 1, label: 'No awareness or controls for GenAI-specific risks' },
+            { value: 2, label: 'Risks are informally understood but not documented or controlled' },
+            { value: 3, label: 'Risks are documented; basic acceptable-use policy in place, but no technical guardrails' },
+            { value: 4, label: 'Documented risk register and defined guardrails covering hallucination, harmful outputs, and PII leakage' },
+            { value: 5, label: 'Comprehensive framework: documented risks, automated output filtering, PII detection, and human-in-the-loop review' },
             { value: 0, label: 'Not sure of current status', isUnsure: true }
           ]
         }
